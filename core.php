@@ -16,16 +16,16 @@
 define('HOST', $_SERVER['SERVER_NAME']);
  
 switch(HOST) 
-	{ 
-	case 'localhost':
-	case '127.0.0.1':
-		define('DBUSER', 'XXX');
-		define('DBPASSWORD', 'XXX');
-		define('DSN', 'mysql:host=localhost;dbname=XXX');
-		define('LOG_FILE', 'H:/USB/xampp/htdocs/dw.log');
-		break; 
-	}
-	
+  { 
+  case 'localhost':
+  case '127.0.0.1':
+    define('DBUSER', 'XXX');
+    define('DBPASSWORD', 'XXX');
+    define('DSN', 'mysql:host=localhost;dbname=XXX');
+    define('LOG_FILE', 'H:/USB/xampp/htdocs/dw.log');
+    break; 
+  }
+  
 class Core {
 
   private static $_instance;
@@ -38,7 +38,7 @@ class Core {
    * Constructor. This is a singleton so do not use. Call getInstance instead.
    */
   private function __construct () {
-	  $this->dbh = new PDO(self::$_dsn,self::$_user,self::$_pass);
+    $this->dbh = new PDO(self::$_dsn,self::$_user,self::$_pass);
   }
 
   /**
@@ -50,35 +50,34 @@ class Core {
    * @return object
    */
   public static function getInstance() {
-    if(!isset(self::$_instance)){
-      $object= __CLASS__;
-      self::$_instance=new $object;
-    }
-    return self::$_instance;
+  if(!isset(self::$_instance)){
+    $object= __CLASS__;
+    self::$_instance=new $object;
   }
-	
-	/**
-	* Process sql statments using PDO
-	*
-	* Author: Daniel Hewes
-	* Date: October 2011
-	*
-	* @param string $sql	the SQL to be processed
-	* @param array $params the parameters to bind (optional)
-	*/
+  return self::$_instance;
+  }
+  
+  /**
+  * Process sql statments using PDO
+  *
+  * Author: Daniel Hewes
+  * Date: October 2011
+  *
+  * @param string $sql	the SQL to be processed
+  * @param array $params the parameters to bind (optional)
+  */
   public function write_PDO($sql, $params = array()) {
-		try {
-			$stmt = $this->dbh->prepare($sql);
-			if (empty($params)) { $stmt->execute(); } 
-			else { $stmt->execute($params); }
-			//$stmt->debugDumpParams();
-			return $stmt->fetchAll(PDO::FETCH_ASSOC);
-		}
-    catch(PDOException $e) {
-			$this->logToFile("An error has occured in the write_PDO Function. Error acquiring data: " . $e->getMessage(), 5);
+    try {
+      $stmt = $this->dbh->prepare($sql);
+      if (empty($params)) { $stmt->execute(); } 
+      else { $stmt->execute($params); }
+      //$stmt->debugDumpParams();
+      return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch(PDOException $e) {
+      $this->logToFile("An error has occured in the write_PDO Function. Error acquiring data: " . $e->getMessage(), 5);
       exit();
     }
-	}
+  }
 
   /**
    * Neatly echo a variable's type and value.
@@ -87,7 +86,7 @@ class Core {
    * @param string $name the name of the variable being written (optional)
    */
   public function write($var, $name='') {
-  	echo '<pre>';
+    echo '<pre>';
     if (!empty($name)) { echo '$', $name, ': '; }
     var_dump($var);
     echo '</pre>';
@@ -108,34 +107,36 @@ class Core {
     $outstr .= '<div style="border:1px solid #333333;padding:5px;margin:20px;background-color:';
     $outstr .= $this->depthHex($depth) . ';">';
     $outstr .= 'array(' . sizeof($array) . ') {<br>';
-      foreach($array as $key=>$value) {
-        $outstr .= '<div style="border:1px solid #333333;padding:5px;margin:5px;background-color:';
-        $outstr .= $this->depthHex($depth+2) . ';">';
-        for ($x=0;$x<$depth;$x++) {
-          $outstr .= '&nbsp;&nbsp;&nbsp;&nbsp;';
-        }
-        $outstr .= '[' . (gettype($key) == 'string' ? '"' : '') . $key;
-        $outstr .= (gettype($key) == 'string' ? '"' : '' ) . '] => ';
-        if (gettype($value) == 'array') {
-          if ($key == 'GLOBALS') {
-            $outstr .=  '$_GLOBALS [not showing to avoid infinite recursion]';
-          } else {
-            if ($recurse==true){
-              $outstr .= $this->writeArrayNicely($value, ($depth+3));
-            }
-          }
-        } elseif (gettype($value) == 'object') {
-          $outstr .=  'Object';
+    foreach($array as $key=>$value) {
+      $outstr .= '<div style="border:1px solid #333333;padding:5px;margin:5px;background-color:';
+      $outstr .= $this->depthHex($depth+2) . ';">';
+      for ($x=0;$x<$depth;$x++) {
+        $outstr .= '&nbsp;&nbsp;&nbsp;&nbsp;';
+      }
+      $outstr .= '[' . (gettype($key) == 'string' ? '"' : '') . $key;
+      $outstr .= (gettype($key) == 'string' ? '"' : '' ) . '] => ';
+      if (gettype($value) == 'array') {
+        if ($key == 'GLOBALS') {
+          $outstr .=  '$_GLOBALS [not showing to avoid infinite recursion]';
         } else {
-          $outstr .=  gettype($value) . ' (' . sizeof($value) . ') "' . strval($value) . '"';
+          if ($recurse==true){
+            $outstr .= $this->writeArrayNicely($value, ($depth+3));
+          }
         }
-        $outstr .=  '<br></div>';
+      } elseif (gettype($value) == 'object') {
+        $outstr .=  'Object';
+      } else {
+        $outstr .=  gettype($value) . ' (' . sizeof($value) . ') "' . strval($value) . '"';
       }
-      for ($x=1;$x<$depth;$x++) {
-        $outstr .=  '&nbsp;&nbsp;&nbsp;&nbsp;';
-      }
-      $outstr .=  '}</div>';
-      return $outstr;
+      $outstr .=  '<br></div>';
+    }
+    
+    for ($x=1;$x<$depth;$x++) {
+      $outstr .=  '&nbsp;&nbsp;&nbsp;&nbsp;';
+    }
+    
+    $outstr .=  '}</div>';
+    return $outstr;
   }
 
   /**
@@ -160,7 +161,7 @@ class Core {
     $mtime = microtime();
     $mtime = explode(" ",$mtime);
     $mtime = $mtime[1] + $mtime[0];
-    $this->starttime = $mtime; 
+    $this->starttime = $mtime;
   }
 
   /**
@@ -173,69 +174,69 @@ class Core {
     $endtime = $mtime;
     $totaltime = ($endtime - $this->starttime);
     //echo 'This page took ',$totaltime,' seconds to prepare.'; 
-		$this->logToFile("$totaltime seconds to prepare.", 1);
+    $this->logToFile("$totaltime seconds to prepare.", 1);
   }
   
-	/**
-	 * Log a string to file
-	 *
-	 * Author: Daniel Hewes
-	 * Date: October 2011
+  /**
+   * Log a string to file
+   *
+   * Author: Daniel Hewes
+   * Date: October 2011
    *
    * @param string $msg	the string to be logged
    * @param int $type the type of message 
-	 *		1:Information
-	 *		2:Audit
-	 *		3:Security
-	 *		4:Debug
-	 *		5:Fatal - Sends email
-	 */
+   *		1:Information
+   *		2:Audit
+   *		3:Security
+   *		4:Debug
+   *		5:Fatal - Sends email
+   */
   public function logToFile($msg, $type) { 
-		$str = '['.date("Y/m/d H:i:s", mktime()).']';
-		$str .= '['.$_SERVER['REMOTE_ADDR'].']';
-		switch ($type) {
-			case 1:
-				$str .= ('[Information]');
-				break;
-			case 2:
-				$str .= ('[Audit]');
-				break;
-			case 3:
-				$str .= ('[Security]');
-				break;
-			case 4:
-				$str .= ('[Debug]');
-				break;
-			case 5:
-				$str .= ('[Fatal]'); #Email MP if this happens.
-				break;
-			}
-		$str .= '['.$_SERVER['PHP_SELF'].']'; # append page
-		$str .= $msg . "\n"; # append date/time/newline
-		
-		error_log($str, 3, LOG_FILE); # use the php function error_log. Second @param = 3 which sets location to const LOG_FILE
-		
-		if($type == 5) { #Oh dear its a fatal error. We better send and email alert.
-			//mailSend("Fatal Error: " . $_SERVER['HTTP_HOST'], $str); //Turned off for localhost testing
-		}
-	}
-	
-	/**
-	 * Sends an email
-	 *
-	 * Used by logToFile().
-	 *
-	 * Author: Daniel Hewes
-	 * Date: October 2011
+    $str = '['.date("Y/m/d H:i:s", mktime()).']';
+    $str .= '['.$_SERVER['REMOTE_ADDR'].']';
+    switch ($type) {
+      case 1:
+        $str .= ('[Information]');
+        break;
+      case 2:
+        $str .= ('[Audit]');
+        break;
+      case 3:
+        $str .= ('[Security]');
+        break;
+      case 4:
+        $str .= ('[Debug]');
+        break;
+      case 5:
+        $str .= ('[Fatal]'); #Email MP if this happens.
+        break;
+      }
+    $str .= '['.$_SERVER['PHP_SELF'].']'; # append page
+    $str .= $msg . "\n"; # append date/time/newline
+    
+    error_log($str, 3, LOG_FILE); # use the php function error_log. Second @param = 3 which sets location to const LOG_FILE
+    
+    if($type == 5) { #Oh dear its a fatal error. We better send and email alert.
+      //mailSend("Fatal Error: " . $_SERVER['HTTP_HOST'], $str); //Turned off for localhost testing
+    }
+  }
+  
+  /**
+   * Sends an email
+   *
+   * Used by logToFile().
+   *
+   * Author: Daniel Hewes
+   * Date: October 2011
    *
    * @param string $subject	the subject of the email
    * @param string $mail_body the body text of the email
-	 * Note: This function assumes all inputs have been validated
-	 */
-	private function mailSend($subject, $mail_body) {
-		$recipient = "contact@danimalweb.co.uk";
-		$subject = $subject;
-		$header = 'From: contact@danimalweb.co.uk'; # optional headerfields	
-		mail($recipient, $subject, $mail_body, $header); # mail command :)
-	}
+   * Note: This function assumes all inputs have been validated
+   */
+  private function mailSend($subject, $mail_body) {
+    $recipient = "contact@danimalweb.co.uk";
+    $subject = $subject;
+    $header = 'From: contact@danimalweb.co.uk'; # optional headerfields	
+    mail($recipient, $subject, $mail_body, $header); # mail command :)
+  }
 }
