@@ -13,7 +13,7 @@
  */
 
  
-define('HOST', $_SERVER['SERVER_NAME']);
+/*define('HOST', $_SERVER['SERVER_NAME']);
  
 switch(HOST) 
   { 
@@ -23,8 +23,8 @@ switch(HOST)
     define('DBPASSWORD', 'XXX');
     define('DSN', 'mysql:host=localhost;dbname=XXX');
     define('LOG_FILE', 'H:/USB/xampp/htdocs/dw.log');
-    break; 
-  }
+    break;
+  }*/
   
 class Core {
 
@@ -37,7 +37,15 @@ class Core {
   /**
    * Constructor. This is a singleton so do not use. Call getInstance instead.
    */
-  private function __construct () {
+  private function __construct ($host = null) {
+    if ($host == null) {
+      define('HOST', $_SERVER['SERVER_NAME']);
+    } else {
+      define('HOST', $host);
+    }
+
+    include 'db_con/'.HOST.'.php';
+
     $this->dbh = new PDO(self::$_dsn,self::$_user,self::$_pass);
   }
 
@@ -74,7 +82,8 @@ class Core {
       //$stmt->debugDumpParams();
       return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch(PDOException $e) {
-      $this->logToFile("An error has occured in the write_PDO Function. Error acquiring data: " . $e->getMessage(), 5);
+      $this->logToFile("An error has occured in the write_PDO Function. 
+                        Error acquiring data: " . $e->getMessage(), 5);
       exit();
     }
   }
