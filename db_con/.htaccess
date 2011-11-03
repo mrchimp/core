@@ -1,4 +1,4 @@
-<files pwds.php>
+<files *>
 order allow,deny
 deny from all
 </files>
