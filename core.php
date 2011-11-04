@@ -172,15 +172,18 @@ class Core {
 
   /**
    * Returns the number of milleseconds elapsed since startTimer() was called
+	 * 
+	 * @param string $what the action which was timed, e.g. a function name, page name, db query.
+	 * Example usage: getTime($_SERVER['PHP_SELF']);
    */
-  public function getTime() {
+  public function getTime ($what = null) {
     $mtime = microtime();
     $mtime = explode(" ",$mtime);
     $mtime = $mtime[1] + $mtime[0];
     $endtime = $mtime;
     $totaltime = ($endtime - $this->starttime);
     //echo 'This page took ',$totaltime,' seconds to prepare.'; 
-    $this->logToFile("$totaltime seconds to prepare.", 1);
+    $this->logToFile("$what took $totaltime seconds to load.", 1);
   }
   
   /**
