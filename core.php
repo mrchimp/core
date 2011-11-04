@@ -41,7 +41,7 @@ class Core {
 		try {
 			$this->dbh = new PDO(DSN,DBUSER,DBPASSWORD);
 		} catch (PDOException $e) {
-			$this->logToFile("Unable to connect to database: " . $e->getMessage() . ". DSN String: " . $_dsn, 5);
+			$this->logToFile("Unable to connect to database: " . $e->getMessage() . ". DSN String: " . DSN, 5);
 			exit();
 		}
 	}
