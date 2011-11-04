@@ -204,19 +204,19 @@ class Core {
     $str = '['.date("D M j G:i:s Y").'] ';
     switch ($type) {
       case 1:
-        $str .= ('[Information] ');
+        $str .= ('[info] ');
         break;
       case 2:
-        $str .= ('[Audit] ');
+        $str .= ('[audit] ');
         break;
       case 3:
-        $str .= ('[Security] ');
+        $str .= ('[security] ');
         break;
       case 4:
-        $str .= ('[Debug] ');
+        $str .= ('[debug] ');
         break;
       case 5:
-        $str .= ('[Fatal] '); #Email MP if this happens.
+        $str .= ('[error] '); #Email MP if this happens.
         break;
       }
 		$str .= '[client '.$_SERVER['REMOTE_ADDR'].'] ';
