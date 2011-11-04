@@ -28,11 +28,12 @@ switch(HOST)
   
 class Core {
 
-  private static $_instance;
   public $dbh;
-  private static $_dsn  = DSN;
-  private static $_user = DBUSER;
-  private static $_pass = DBPASSWORD;
+  
+  private static $_instance;
+  private static $_dsn;
+  private static $_user;
+  private static $_pass;
   
   /**
    * Constructor. This is a singleton so do not use. Call getInstance instead.
@@ -45,8 +46,13 @@ class Core {
     }
 
     include 'db_con/'.HOST.'.php';
-
-    $this->dbh = new PDO(self::$_dsn,self::$_user,self::$_pass);
+    
+    $this->_dsn  = DSN;
+    $this->_user = DBUSER;
+    $this->_pass = DBPASSWORD;
+    
+    $this->dbh = new PDO($this->_dsn,$this->_user,$this->_pass);
+    $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
   }
 
   /**
