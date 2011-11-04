@@ -198,26 +198,26 @@ class Core {
    *		5:Fatal - Sends email
    */
   public function logToFile($msg, $type) { 
-    $str = '['.date("Y/m/d H:i:s", mktime()).']';
-    $str .= '['.$_SERVER['REMOTE_ADDR'].']';
+    $str = '['.date("D M j G:i:s Y").'] ';
     switch ($type) {
       case 1:
-        $str .= ('[Information]');
+        $str .= ('[Information] ');
         break;
       case 2:
-        $str .= ('[Audit]');
+        $str .= ('[Audit] ');
         break;
       case 3:
-        $str .= ('[Security]');
+        $str .= ('[Security] ');
         break;
       case 4:
-        $str .= ('[Debug]');
+        $str .= ('[Debug] ');
         break;
       case 5:
-        $str .= ('[Fatal]'); #Email MP if this happens.
+        $str .= ('[Fatal] '); #Email MP if this happens.
         break;
       }
-    $str .= '['.$_SERVER['PHP_SELF'].']'; # append page
+		$str .= '[client '.$_SERVER['REMOTE_ADDR'].'] ';
+    //$str .= '['.$_SERVER['PHP_SELF'].'] '; # append page
     $str .= $msg . "\n"; # append date/time/newline
     
     error_log($str, 3, LOG_FILE); # use the php function error_log. Second @param = 3 which sets location to const LOG_FILE
