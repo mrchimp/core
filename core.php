@@ -201,7 +201,7 @@ class Core {
    *		5:Fatal - Sends email
    */
   public function logToFile($msg, $type) { 
-    $str = '['.date("D M j G:i:s Y").'] ';
+    $str = '['.date("D M d G:i:s Y").'] ';
     switch ($type) {
       case 1:
         $str .= ('[info] ');
