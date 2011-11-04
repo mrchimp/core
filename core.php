@@ -36,7 +36,7 @@ class Core {
   private static $_dsn  = DSN;
   private static $_user = DBUSER;
   private static $_pass = DBPASSWORD;
-  
+	
   /**
    * Constructor. This is a singleton so do not use. Call getInstance instead.
    */
@@ -48,7 +48,14 @@ class Core {
     }
 
     include 'db_con/'.HOST.'.php';
-
+		
+		try {
+   		$this->dbh = new PDO(self::$_dsn,self::$_user,self::$_pass);
+		} catch (PDOException $e) {
+			 $this->logToFile("Unable to connect to database: " . $e->getMessage(), 5);
+			 exit();
+		}
+		
     $this->dbh = new PDO(self::$_dsn,self::$_user,self::$_pass);
   }
 
@@ -246,9 +253,9 @@ class Core {
    * Note: This function assumes all inputs have been validated
    */
   private function mailSend($subject, $mail_body) {
-    $recipient = "contact@danimalweb.co.uk";
+    $recipient = EMAIL;
     $subject = $subject;
-    $header = 'From: contact@danimalweb.co.uk'; # optional headerfields	
+    $header = 'From: ' . EMAIL; # optional headerfields	
     mail($recipient, $subject, $mail_body, $header); # mail command :)
   }
 }
