@@ -14,28 +14,17 @@ if (!defined('IN_SCRIPT')) header("HTTP/1.0 404 Not Found");
  * @license	Unlicensed
  *
  */
-
- 
-/*define('HOST', $_SERVER['SERVER_NAME']);
- 
-switch(HOST) 
-  { 
-  case 'localhost':
-  case '127.0.0.1':
-    define('DBUSER', 'XXX');
-    define('DBPASSWORD', 'XXX');
-    define('DSN', 'mysql:host=localhost;dbname=XXX');
-    define('LOG_FILE', 'H:/USB/xampp/htdocs/dw.log');
-    break;
-  }*/
   
 class Core {
 
-  private static $_instance;
+	private static $_instance;
   public $dbh;
-  private static $_dsn  = DSN;
-  private static $_user = DBUSER;
-  private static $_pass = DBPASSWORD;
+	
+	//These no longer work if the include is called from within __construct. 
+	//The consts do not have a value until included.
+  //private static $_dsn  = DSN;
+  //private static $_user = DBUSER;
+  //private static $_pass = DBPASSWORD;
 	
   /**
    * Constructor. This is a singleton so do not use. Call getInstance instead.
@@ -46,18 +35,16 @@ class Core {
     } else {
       define('HOST', $host);
     }
-
+		
     include 'db_con/'.HOST.'.php';
-		
+
 		try {
-   		$this->dbh = new PDO(self::$_dsn,self::$_user,self::$_pass);
+			$this->dbh = new PDO(DSN,DBUSER,DBPASSWORD);
 		} catch (PDOException $e) {
-			 $this->logToFile("Unable to connect to database: " . $e->getMessage(), 5);
-			 exit();
+			$this->logToFile("Unable to connect to database: " . $e->getMessage() . ". DSN String: " . $_dsn, 5);
+			exit();
 		}
-		
-    $this->dbh = new PDO(self::$_dsn,self::$_user,self::$_pass);
-  }
+	}
 
   /**
    * Returns an instance of the class.
