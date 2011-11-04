@@ -1,4 +1,7 @@
 <?php
+//Protects direct script access. Use: define('IN_SCRIPT', true); in you main files.
+if (!defined('IN_SCRIPT')) header("HTTP/1.0 404 Not Found");
+
 /**
  * Database connection and helper function class
  *
