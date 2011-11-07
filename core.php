@@ -16,21 +16,12 @@
 class Core {
 
   public $dbh;
-<<<<<<< HEAD
-  
-  private static $_instance;
-  private static $_dsn;
-  private static $_user;
-  private static $_pass;
-  
-=======
 	
 	private static $_instance;
   private static $_dsn;
   private static $_user;
   private static $_pass;
-	
->>>>>>> d8a3f1ff6c27b440713aedbec15d4a0e8e8863fe
+
   /**
    * Constructor. This is a singleton so do not use. Call getInstance instead.
    */
@@ -42,17 +33,7 @@ class Core {
     }
 		
     include 'db_con/'.HOST.'.php';
-<<<<<<< HEAD
     
-    $this->_dsn  = DSN;
-    $this->_user = DBUSER;
-    $this->_pass = DBPASSWORD;
-    
-    $this->dbh = new PDO($this->_dsn,$this->_user,$this->_pass);
-    $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  }
-=======
-		
 		$this->_dsn  = DSN;
     $this->_user = DBUSER;
     $this->_pass = DBPASSWORD;
@@ -66,7 +47,6 @@ class Core {
 			exit(0);
 		}
 	}
->>>>>>> d8a3f1ff6c27b440713aedbec15d4a0e8e8863fe
 
   /**
    * Returns an instance of the class.
