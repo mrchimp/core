@@ -1,6 +1,4 @@
-<?php
-//Protects direct script access. Use: define('IN_SCRIPT', true); in you main files.
-if (!defined('IN_SCRIPT')) header("HTTP/1.0 404 Not Found");
+<?php if (!defined('IN_SCRIPT')) header("HTTP/1.0 404 Not Found"); //Protects direct script access. Use: define('IN_SCRIPT', true); in you main files.
 
 /**
  * Database connection and helper function class
@@ -17,14 +15,12 @@ if (!defined('IN_SCRIPT')) header("HTTP/1.0 404 Not Found");
   
 class Core {
 
-	private static $_instance;
   public $dbh;
 	
-	//These no longer work if the include is called from within __construct. 
-	//The consts do not have a value until included.
-  //private static $_dsn  = DSN;
-  //private static $_user = DBUSER;
-  //private static $_pass = DBPASSWORD;
+	private static $_instance;
+  private static $_dsn;
+  private static $_user;
+  private static $_pass;
 	
   /**
    * Constructor. This is a singleton so do not use. Call getInstance instead.
@@ -37,11 +33,16 @@ class Core {
     }
 		
     include 'db_con/'.HOST.'.php';
-
+		
+		$this->_dsn  = DSN;
+    $this->_user = DBUSER;
+    $this->_pass = DBPASSWORD;
+		
 		try {
-			$this->dbh = new PDO(DSN,DBUSER,DBPASSWORD);
+			$this->dbh = new PDO($this->_dsn,$this->_user,$this->_pass);
+    	$this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		} catch (PDOException $e) {
-			$this->logToFile("Unable to connect to database: " . $e->getMessage() . ". DSN String: " . DSN, 5);
+			$this->logToFile("Unable to connect to database: " . $e->getMessage(), 5);
 			exit();
 		}
 	}
@@ -71,7 +72,7 @@ class Core {
   * @param string $sql	the SQL to be processed
   * @param array $params the parameters to bind (optional)
   */
-  public function write_PDO($sql, $params = array()) {
+  public function executeSQL($sql, $params = array()) {
     try {
       $stmt = $this->dbh->prepare($sql);
       if (empty($params)) { $stmt->execute(); } 
@@ -79,7 +80,7 @@ class Core {
       //$stmt->debugDumpParams();
       return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch(PDOException $e) {
-      $this->logToFile("An error has occured in the write_PDO Function. 
+      $this->logToFile("An error has occured in the executeSQL Function. 
                         Error acquiring data: " . $e->getMessage(), 5);
       exit();
     }
@@ -182,7 +183,6 @@ class Core {
     $mtime = $mtime[1] + $mtime[0];
     $endtime = $mtime;
     $totaltime = ($endtime - $this->starttime);
-    //echo 'This page took ',$totaltime,' seconds to prepare.'; 
     $this->logToFile("$what took $totaltime seconds to load.", 1);
   }
   
