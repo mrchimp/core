@@ -1,4 +1,5 @@
-<?php
+<?php if (!defined('IN_SCRIPT')) header($_SERVER['SERVER_PROTOCOL'] . "404 Not Found"); //Protects direct script access. Use: define('IN_SCRIPT', true); in you main files.
+
 /**
  * Database connection and helper function class
  *
@@ -11,30 +12,25 @@
  * @license	Unlicensed
  *
  */
-
- 
-/*define('HOST', $_SERVER['SERVER_NAME']);
- 
-switch(HOST) 
-  { 
-  case 'localhost':
-  case '127.0.0.1':
-    define('DBUSER', 'XXX');
-    define('DBPASSWORD', 'XXX');
-    define('DSN', 'mysql:host=localhost;dbname=XXX');
-    define('LOG_FILE', 'H:/USB/xampp/htdocs/dw.log');
-    break;
-  }*/
   
 class Core {
 
   public $dbh;
+<<<<<<< HEAD
   
   private static $_instance;
   private static $_dsn;
   private static $_user;
   private static $_pass;
   
+=======
+	
+	private static $_instance;
+  private static $_dsn;
+  private static $_user;
+  private static $_pass;
+	
+>>>>>>> d8a3f1ff6c27b440713aedbec15d4a0e8e8863fe
   /**
    * Constructor. This is a singleton so do not use. Call getInstance instead.
    */
@@ -44,8 +40,9 @@ class Core {
     } else {
       define('HOST', $host);
     }
-
+		
     include 'db_con/'.HOST.'.php';
+<<<<<<< HEAD
     
     $this->_dsn  = DSN;
     $this->_user = DBUSER;
@@ -54,6 +51,22 @@ class Core {
     $this->dbh = new PDO($this->_dsn,$this->_user,$this->_pass);
     $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
   }
+=======
+		
+		$this->_dsn  = DSN;
+    $this->_user = DBUSER;
+    $this->_pass = DBPASSWORD;
+		
+		try {
+			$this->dbh = new PDO($this->_dsn,$this->_user,$this->_pass);
+    	$this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		} catch (PDOException $e) {
+			$this->logEvent("Unable to connect to database: " . $e->getMessage(), 5);
+			header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
+			exit(0);
+		}
+	}
+>>>>>>> d8a3f1ff6c27b440713aedbec15d4a0e8e8863fe
 
   /**
    * Returns an instance of the class.
@@ -80,7 +93,7 @@ class Core {
   * @param string $sql	the SQL to be processed
   * @param array $params the parameters to bind (optional)
   */
-  public function write_PDO($sql, $params = array()) {
+  public function executeSQL($sql, $params = array()) {
     try {
       $stmt = $this->dbh->prepare($sql);
       if (empty($params)) { $stmt->execute(); } 
@@ -88,9 +101,10 @@ class Core {
       //$stmt->debugDumpParams();
       return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch(PDOException $e) {
-      $this->logToFile("An error has occured in the write_PDO Function. 
+      $this->logEvent("An error has occured in the executeSQL Function. 
                         Error acquiring data: " . $e->getMessage(), 5);
-      exit();
+      header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
+			exit(0);
     }
   }
 
@@ -181,15 +195,17 @@ class Core {
 
   /**
    * Returns the number of milleseconds elapsed since startTimer() was called
+	 * 
+	 * @param string $what the action which was timed, e.g. a function name, page name, db query.
+	 * Example usage: getTime($_SERVER['PHP_SELF']);
    */
-  public function getTime() {
+  public function getTime ($what = null) {
     $mtime = microtime();
     $mtime = explode(" ",$mtime);
     $mtime = $mtime[1] + $mtime[0];
     $endtime = $mtime;
     $totaltime = ($endtime - $this->starttime);
-    //echo 'This page took ',$totaltime,' seconds to prepare.'; 
-    $this->logToFile("$totaltime seconds to prepare.", 1);
+    $this->logEvent("$what took $totaltime seconds to load.", 1);
   }
   
   /**
@@ -206,27 +222,28 @@ class Core {
    *		4:Debug
    *		5:Fatal - Sends email
    */
-  public function logToFile($msg, $type) { 
-    $str = '['.date("Y/m/d H:i:s", mktime()).']';
-    $str .= '['.$_SERVER['REMOTE_ADDR'].']';
+  public function logEvent($msg, $type) { 
+	
+    $str = '['.date("D M d G:i:s Y").'] ';
     switch ($type) {
       case 1:
-        $str .= ('[Information]');
+        $str .= ('[info] ');
         break;
       case 2:
-        $str .= ('[Audit]');
+        $str .= ('[audit] ');
         break;
       case 3:
-        $str .= ('[Security]');
+        $str .= ('[security] ');
         break;
       case 4:
-        $str .= ('[Debug]');
+        $str .= ('[debug] ');
         break;
       case 5:
-        $str .= ('[Fatal]'); #Email MP if this happens.
+        $str .= ('[error] '); #Email MP if this happens.
         break;
       }
-    $str .= '['.$_SERVER['PHP_SELF'].']'; # append page
+		$str .= '[client '.$_SERVER['REMOTE_ADDR'].'] ';
+    //$str .= '['.$_SERVER['PHP_SELF'].'] '; # append page
     $str .= $msg . "\n"; # append date/time/newline
     
     error_log($str, 3, LOG_FILE); # use the php function error_log. Second @param = 3 which sets location to const LOG_FILE
@@ -249,9 +266,9 @@ class Core {
    * Note: This function assumes all inputs have been validated
    */
   private function mailSend($subject, $mail_body) {
-    $recipient = "contact@danimalweb.co.uk";
+    $recipient = EMAIL;
     $subject = $subject;
-    $header = 'From: contact@danimalweb.co.uk'; # optional headerfields	
+    $header = 'From: ' . EMAIL; # optional headerfields	
     mail($recipient, $subject, $mail_body, $header); # mail command :)
   }
 }
