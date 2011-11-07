@@ -1,4 +1,4 @@
-<?php if (!defined('IN_SCRIPT')) header("HTTP/1.0 404 Not Found"); //Protects direct script access. Use: define('IN_SCRIPT', true); in you main files.
+<?php if (!defined('IN_SCRIPT')) header($_SERVER['SERVER_PROTOCOL'] . "404 Not Found"); //Protects direct script access. Use: define('IN_SCRIPT', true); in you main files.
 
 /**
  * Database connection and helper function class
@@ -42,8 +42,9 @@ class Core {
 			$this->dbh = new PDO($this->_dsn,$this->_user,$this->_pass);
     	$this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		} catch (PDOException $e) {
-			$this->logToFile("Unable to connect to database: " . $e->getMessage(), 5);
-			exit();
+			$this->logEvent("Unable to connect to database: " . $e->getMessage(), 5);
+			header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
+			exit(0);
 		}
 	}
 
@@ -80,9 +81,10 @@ class Core {
       //$stmt->debugDumpParams();
       return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch(PDOException $e) {
-      $this->logToFile("An error has occured in the executeSQL Function. 
+      $this->logEvent("An error has occured in the executeSQL Function. 
                         Error acquiring data: " . $e->getMessage(), 5);
-      exit();
+      header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
+			exit(0);
     }
   }
 
@@ -183,7 +185,7 @@ class Core {
     $mtime = $mtime[1] + $mtime[0];
     $endtime = $mtime;
     $totaltime = ($endtime - $this->starttime);
-    $this->logToFile("$what took $totaltime seconds to load.", 1);
+    $this->logEvent("$what took $totaltime seconds to load.", 1);
   }
   
   /**
@@ -200,7 +202,8 @@ class Core {
    *		4:Debug
    *		5:Fatal - Sends email
    */
-  public function logToFile($msg, $type) { 
+  public function logEvent($msg, $type) { 
+	
     $str = '['.date("D M d G:i:s Y").'] ';
     switch ($type) {
       case 1:
