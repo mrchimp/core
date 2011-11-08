@@ -46,7 +46,7 @@ class Core {
       header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
       exit(0);
     }
-	}
+  }
 
   /**
    * Returns an instance of the class.
@@ -175,9 +175,9 @@ class Core {
 
   /**
    * Returns the number of milleseconds elapsed since startTimer() was called
-	 * 
-	 * @param string $what the action which was timed, e.g. a function name, page name, db query.
-	 * Example usage: getTime($_SERVER['PHP_SELF']);
+   * 
+   * @param string $what the action which was timed, e.g. a function name, page name, db query.
+   * Example usage: getTime($_SERVER['PHP_SELF']);
    */
   public function getTime ($what = null) {
     $mtime = microtime();
@@ -203,7 +203,6 @@ class Core {
    *		5:Fatal - Sends email
    */
   public function logEvent($msg, $type) { 
-	
     $str = '['.date("D M d G:i:s Y").'] ';
     switch ($type) {
       case 1:
@@ -225,9 +224,7 @@ class Core {
     $str .= '[client '.$_SERVER['REMOTE_ADDR'].'] ';
     //$str .= '['.$_SERVER['PHP_SELF'].'] '; # append page
     $str .= $msg . "\n"; # append date/time/newline
-    
     error_log($str, 3, LOG_FILE); # use the php function error_log. Second @param = 3 which sets location to const LOG_FILE
-    
     if($type == 5) { #Oh dear its a fatal error. We better send and email alert.
       //mailSend("Fatal Error: " . $_SERVER['HTTP_HOST'], $str); //Turned off for localhost testing
     }
