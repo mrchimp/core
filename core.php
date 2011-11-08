@@ -42,7 +42,7 @@ class Core {
       $this->dbh = new PDO($this->_dsn,$this->_user,$this->_pass);
       $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     } catch (PDOException $e) {
-      $this->logEvent("Unable to connect to database: " . $e->getMessage(), 5);
+      $this->logEvent("Unable to establish a database connection: " . $e->getMessage(), 5);
       header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
       exit(0);
     }
