@@ -1,4 +1,4 @@
-<?php if (!defined('IN_SCRIPT')) header($_SERVER['SERVER_PROTOCOL'] . "404 Not Found"); //Protects direct script access. Use: define('IN_SCRIPT', true); in you main files.
+<?php if (!defined('IN_SCRIPT')) { header($_SERVER['SERVER_PROTOCOL'] . "404 Not Found"); exit(0); }//Protects direct script access. Use: define('IN_SCRIPT', true); in you main files.
 
 /**
  * Database connection and helper function class
@@ -16,8 +16,8 @@
 class Core {
 
   public $dbh;
-	
-	private static $_instance;
+
+  private static $_instance;
   private static $_dsn;
   private static $_user;
   private static $_pass;
@@ -34,18 +34,18 @@ class Core {
 		
     include 'db_con/'.HOST.'.php';
     
-		$this->_dsn  = DSN;
+    $this->_dsn  = DSN;
     $this->_user = DBUSER;
     $this->_pass = DBPASSWORD;
 		
-		try {
-			$this->dbh = new PDO($this->_dsn,$this->_user,$this->_pass);
-    	$this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		} catch (PDOException $e) {
-			$this->logEvent("Unable to connect to database: " . $e->getMessage(), 5);
-			header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
-			exit(0);
-		}
+    try {
+      $this->dbh = new PDO($this->_dsn,$this->_user,$this->_pass);
+      $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    } catch (PDOException $e) {
+      $this->logEvent("Unable to connect to database: " . $e->getMessage(), 5);
+      header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
+      exit(0);
+    }
 	}
 
   /**
@@ -84,7 +84,7 @@ class Core {
       $this->logEvent("An error has occured in the executeSQL Function. 
                         Error acquiring data: " . $e->getMessage(), 5);
       header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
-			exit(0);
+      exit(0);
     }
   }
 
@@ -222,7 +222,7 @@ class Core {
         $str .= ('[error] '); #Email MP if this happens.
         break;
       }
-		$str .= '[client '.$_SERVER['REMOTE_ADDR'].'] ';
+    $str .= '[client '.$_SERVER['REMOTE_ADDR'].'] ';
     //$str .= '['.$_SERVER['PHP_SELF'].'] '; # append page
     $str .= $msg . "\n"; # append date/time/newline
     
