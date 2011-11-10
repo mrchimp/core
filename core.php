@@ -1,4 +1,4 @@
-<?php if (!defined('IN_SCRIPT')) { header($_SERVER['SERVER_PROTOCOL'] . "404 Not Found"); exit(0); }//Protects direct script access. Use: define('IN_SCRIPT', true); in you main files.
+<?php if (!defined('IN_SCRIPT')) { header($_SERVER['SERVER_PROTOCOL'] . " 404 Not Found"); exit(0); }//Protects direct script access. Use: define('IN_SCRIPT', true); in you main files.
 
 /**
  * Database connection and helper function class
