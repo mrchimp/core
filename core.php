@@ -241,11 +241,17 @@ class Core {
    * @param string $subject	the subject of the email
    * @param string $mail_body the body text of the email
    * Note: This function assumes all inputs have been validated
+   * This needs to be secured!! 'TO:', 'CC:', 'CCO:' or 'Content-Type' should be stripped out from $mail_body.
    */
-  private function mailSend($subject, $mail_body) {
-    $recipient = EMAIL;
-    $subject = $subject;
-    $header = 'From: ' . EMAIL; # optional headerfields	
-    mail($recipient, $subject, $mail_body, $header); # mail command :)
+  public function mailSend($subject, $mail_body, $from = NULL) {
+	$recipient = EMAIL;
+	if (empty($from)) { $header = 'From: ' . EMAIL; } 
+	else { $header = 'From: ' . $from; }
+	if(@mail($recipient, $subject, $mail_body, $header)) {
+		return true;
+	} else {
+		$this->logEvent("mailSend function failed.", 4); //Do ***NOT*** set logEvent $type = 5. I might cause the mailSend function to call itself infinitely.
+		return false;
+	}
   }
 }
