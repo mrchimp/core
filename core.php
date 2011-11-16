@@ -39,7 +39,7 @@ class Core {
     self::$_pass = DBPASSWORD;
 		
     try {
-      $this->dbh = new PDO(self::$_dsn,self::$_user,$this->_pass);
+      $this->dbh = new PDO(self::$_dsn,self::$_user,self::$_pass);
       $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     } catch (PDOException $e) {
       $this->logEvent("Unable to establish a database connection: " . $e->getMessage(), 5);
