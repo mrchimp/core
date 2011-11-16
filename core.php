@@ -1,4 +1,4 @@
-<?php if (!defined('IN_SCRIPT')) { header($_SERVER['SERVER_PROTOCOL'] . " 404 Not Found"); exit(0); }//Protects direct script access. Use: define('IN_SCRIPT', true); in you main files.
+<?php if (!defined('IN_SCRIPT')) { header($_SERVER['SERVER_PROTOCOL'] . " 404 Not Found"); exit(0); }
 
 /**
  * Database connection and helper function class
@@ -218,14 +218,13 @@ class Core {
         $str .= ('[debug] ');
         break;
       case 5:
-        $str .= ('[error] '); #Email MP if this happens.
+        $str .= ('[error] ');
         break;
       }
     $str .= '[client '.$_SERVER['REMOTE_ADDR'].'] ';
-    //$str .= '['.$_SERVER['PHP_SELF'].'] '; # append page
-    $str .= $msg . "\n"; # append date/time/newline
-    error_log($str, 3, LOG_FILE); # use the php function error_log. Second @param = 3 which sets location to const LOG_FILE
-    if($type == 5) { #Oh dear its a fatal error. We better send and email alert.
+    $str .= $msg . "\n";
+    error_log($str, 3, LOG_FILE);
+    if($type == 5) {
       $this->mailSend("Fatal Error: " . $_SERVER['HTTP_HOST'], $str);
     }
   }
@@ -240,8 +239,12 @@ class Core {
    *
    * @param string $subject	the subject of the email
    * @param string $mail_body the body text of the email
-   * Note: This function assumes all inputs have been validated
-   * This needs to be secured!! 'TO:', 'CC:', 'CCO:' or 'Content-Type' should be stripped out from $mail_body.
+   *
+   * Assumes all inputs have been validated
+   * This needs to be secured!! 'TO:', 'CC:', 'CCO:' or 'Content-Type' should be stripped from $mail_body.
+   * ***DO NOT*** set logEvent $type=5. It might cause the mailSend function to call itself infinitely.
+   * There is no decent error handling for this function.  Try/catch will not work. The error procuded is output and not classed as an exception.
+   * Look in to set_error_handler. 
    */
   public function mailSend($subject, $mail_body, $from = NULL) {
     $recipient = EMAIL;
@@ -250,9 +253,6 @@ class Core {
     if(@mail($recipient, $subject, $mail_body, $header)) {
       return true;
     } else {
-      //Do ***NOT*** set logEvent $type = 5. I might cause the mailSend function to call itself infinitely.<br>
-      //Note there is currently no decent error handling for this function. try/catch will not work as on error this echos out the error message not classed as an exception.
-      //Look in to set_error_handler. 
       $this->logEvent("mailSend function failed. Subject: $subject | Message was: $mail_body", 4);
       return false;
     }
