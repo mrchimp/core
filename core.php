@@ -34,12 +34,12 @@ class Core {
 		
     include 'db_con/'.HOST.'.php';
     
-    $this->_dsn  = DSN;
-    $this->_user = DBUSER;
-    $this->_pass = DBPASSWORD;
+    self::$_dsn  = DSN;
+    self::$_user = DBUSER;
+    self::$_pass = DBPASSWORD;
 		
     try {
-      $this->dbh = new PDO($this->_dsn,$this->_user,$this->_pass);
+      $this->dbh = new PDO(self::$_dsn,self::$_user,$this->_pass);
       $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     } catch (PDOException $e) {
       $this->logEvent("Unable to establish a database connection: " . $e->getMessage(), 5);
