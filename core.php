@@ -226,7 +226,7 @@ class Core {
     $str .= $msg . "\n"; # append date/time/newline
     error_log($str, 3, LOG_FILE); # use the php function error_log. Second @param = 3 which sets location to const LOG_FILE
     if($type == 5) { #Oh dear its a fatal error. We better send and email alert.
-      //mailSend("Fatal Error: " . $_SERVER['HTTP_HOST'], $str); //Turned off for localhost testing
+      $this->mailSend("Fatal Error: " . $_SERVER['HTTP_HOST'], $str);
     }
   }
   
@@ -250,7 +250,10 @@ class Core {
     if(@mail($recipient, $subject, $mail_body, $header)) {
       return true;
     } else {
-      $this->logEvent("mailSend function failed.", 4); //Do ***NOT*** set logEvent $type = 5. I might cause the mailSend function to call itself infinitely.
+      //Do ***NOT*** set logEvent $type = 5. I might cause the mailSend function to call itself infinitely.<br>
+      //Note there is currently no decent error handling for this function. try/catch will not work as on error this echos out the error message not classed as an exception.
+      //Look in to set_error_handler. 
+      $this->logEvent("mailSend function failed. Subject: $subject | Message was: $mail_body", 4);
       return false;
     }
   }
