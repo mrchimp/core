@@ -72,5 +72,5 @@ Logs an email to the file specified in db\_con/<hostname>.php. If $type is 5 the
 mailSend(string $subject, string $mailBody, string $from)
 ----------------------------------------------------------
 
-Sends an email to the email address specified in db\_con/<hostname>.php.
+Sends an email to the email address specified in db\_con/HOSTNAME.php.
 
