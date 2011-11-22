@@ -114,40 +114,40 @@ class Core {
     if (!is_array($array)) {
       return '<p>That wasn\'t an array.</p>';
     }
-    $outstr = '';
-    $outstr .= '<div style="border:1px solid #333333;padding:5px;margin:20px;background-color:';
-    $outstr .= $this->depthHex($depth) . ';">';
-    $outstr .= 'array(' . sizeof($array) . ') {<br>';
+    $o = '';
+    $o .= '<div style="border:1px solid #333333;padding:5px;margin:20px;background-color:';
+    $o .= $this->depthHex($depth) . ';">';
+    $o .= 'array(' . sizeof($array) . ') {<br>';
     foreach($array as $key=>$value) {
-      $outstr .= '<div style="border:1px solid #333333;padding:5px;margin:5px;background-color:';
-      $outstr .= $this->depthHex($depth+2) . ';">';
+      $o .= '<div style="border:1px solid #333333;padding:5px;margin:5px;background-color:';
+      $o .= $this->depthHex($depth+2) . ';">';
       for ($x=0;$x<$depth;$x++) {
-        $outstr .= '&nbsp;&nbsp;&nbsp;&nbsp;';
+        $o .= '&nbsp;&nbsp;&nbsp;&nbsp;';
       }
-      $outstr .= '[' . (gettype($key) == 'string' ? '"' : '') . $key;
-      $outstr .= (gettype($key) == 'string' ? '"' : '' ) . '] => ';
+      $o .= '[' . (gettype($key) == 'string' ? '"' : '') . $key;
+      $o .= (gettype($key) == 'string' ? '"' : '' ) . '] => ';
       if (gettype($value) == 'array') {
         if ($key == 'GLOBALS') {
-          $outstr .=  '$_GLOBALS [not showing to avoid infinite recursion]';
+          $o .=  '$_GLOBALS [not showing to avoid infinite recursion]';
         } else {
           if ($recurse==true){
-            $outstr .= $this->writeArrayNicely($value, ($depth+3));
+            $o .= $this->writeArrayNicely($value, ($depth+3));
           }
         }
       } elseif (gettype($value) == 'object') {
-        $outstr .=  'Object';
+        $o .=  'Object';
       } else {
-        $outstr .=  gettype($value) . ' (' . sizeof($value) . ') "' . strval($value) . '"';
+        $o .=  gettype($value) . ' (' . sizeof($value) . ') "' . strval($value) . '"';
       }
-      $outstr .=  '<br></div>';
+      $o .=  '<br></div>';
     }
     
     for ($x=1;$x<$depth;$x++) {
-      $outstr .=  '&nbsp;&nbsp;&nbsp;&nbsp;';
+      $o .=  '&nbsp;&nbsp;&nbsp;&nbsp;';
     }
     
-    $outstr .=  '}</div>';
-    return $outstr;
+    $o .=  '}</div>';
+    return $o;
   }
 
   /**
@@ -155,7 +155,9 @@ class Core {
    *
    * Used by WriteArrayNicely().
    *
-   * @param int $depth	the level of nesting. The higher the number the darker the resulting colour.
+   * @param int $depth the level of nesting. The higher the number the darker 
+   *                   the resulting colour.
+   * @return string the generated hex color, including leading #
    */
   private function depthHex($depth) {
     $color_val = (16 - ($depth * 1));
@@ -181,7 +183,7 @@ class Core {
    * @param string $what the action which was timed, e.g. a function name, page name, db query.
    * Example usage: getTime($_SERVER['PHP_SELF']);
    */
-  public function getTime ($what = null) {
+  public function getTime($what = null) {
     $mtime = microtime();
     $mtime = explode(" ",$mtime);
     $mtime = $mtime[1] + $mtime[0];
