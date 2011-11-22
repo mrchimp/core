@@ -178,7 +178,7 @@ class Core {
   }
 
   /**
-   * Returns the number of milleseconds elapsed since startTimer() was called
+   * Returns the number of seconds elapsed since startTimer() was called
    * 
    * @param string $what the action which was timed, e.g. a function name, page name, db query.
    * Example usage: getTime($_SERVER['PHP_SELF']);
@@ -189,9 +189,19 @@ class Core {
     $mtime = $mtime[1] + $mtime[0];
     $endtime = $mtime;
     $totaltime = ($endtime - $this->starttime);
-    $this->logEvent("$what took $totaltime seconds to load.", 1);
+    return $totaltime;
   }
-  
+ 
+  /**
+   * Logs the duration of an event in seconds
+   *
+   * @param string $event_name the name of the event being timed
+   */
+  public function logEventTime($event_name) {
+    $time = $this->getTime();
+    $this->logEvent("$event_name took $time seconds.", 1);
+  }
+
   /**
    * Log a string to file
    *

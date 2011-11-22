@@ -47,7 +47,13 @@ Starts the timer.
 getTime(string $what = null)
 ----------------------------
 
-... kind of broken. See issue #1.
+Returns the number of seconds elapsed since startTimer() was called. Returned value is a float to millisecond accuracy.
+
+
+logEventTime($event\_name) 
+-------------------------
+
+Logs the time taken since startTimer() was called to the log file defined in the config file.
 
 
 logEvent(string $message, int $type)
