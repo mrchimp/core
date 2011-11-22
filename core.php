@@ -32,7 +32,9 @@ class Core {
       define('HOST', $host);
     }
 		
-    include 'db_con/'.HOST.'.php';
+    if (@!include 'db_con/'.HOST.'.php') {
+      die('Database server is not configured on this server.');
+    }
     
     self::$_dsn  = DSN;
     self::$_user = DBUSER;
