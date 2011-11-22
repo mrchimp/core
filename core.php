@@ -107,10 +107,11 @@ class Core {
    * Echo an array's contents within nested divs
    *
    * @param array $array   the array to be written
+   * @param bool  $recurse set to false to only write the first layer of the array.
+   *                       Prevents the function from recursively calling itself.
    * @param int   $depth   do not set manually. used when the function calls itself
-   * @param int   $recurse do not set manually. used when the function calls itself
    */
-  public function writeArrayNicely($array, $depth=1, $recurse=true) {
+  public function writeArrayNicely($array, $recurse=true, $depth=1) {
     if (!is_array($array)) {
       return '<p>That wasn\'t an array.</p>';
     }
@@ -131,7 +132,7 @@ class Core {
           $o .=  '$_GLOBALS [not showing to avoid infinite recursion]';
         } else {
           if ($recurse==true){
-            $o .= $this->writeArrayNicely($value, ($depth+3));
+            $o .= $this->writeArrayNicely($value, true, ($depth+3));
           }
         }
       } elseif (gettype($value) == 'object') {

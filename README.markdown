@@ -32,10 +32,10 @@ write($var, string $name='')
 var\_dump()s $var between PRE tags. If $name is specified it will be written out first. Sometimes handy if you're using write() a lot.
 
 
-writeArrayNicely(array $array, int $depth=1, bool $recurse=true)
+writeArrayNicely(array $array, bool $recurse=true)
 ----------------------------------------------------------------
 
-Takes an array and writes it in nested divs with greyscale backgrounds representing the depth within the array. Works with n-dimension arrays. $depth and $recurse should not be set manually. They're for when the function calls itself, which it does, recursively. If an array contains a reference to itself or something weird like that then it will get stuck. There's a hack in to make it work with $\_GLOBALS but this could be fixed to prevent any recursive failure.
+Takes an array and writes it in nested divs with greyscale backgrounds representing the depth within the array. Works with n-dimension arrays. Set $recurse to false to prevent it writing out the contents of arrays within the array. This is to prevent an infinite loop if the arraycontains a reference to itself or something weird like that. There's a hack to prevent this happening when writing out $\_GLOBALS but this could be fixed to prevent this happening with any array.
 
 
 startTimer()
