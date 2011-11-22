@@ -7,8 +7,8 @@ Provides PDO connection and some helper functions.
 Accessing PDO handler
 =====================
 
-$core = Core::getInstance();
-$core->dbh; // This is the database handler
+    $core = Core::getInstance();
+    $core->dbh; // This is the database handler
 
 
 Public Methods
@@ -61,12 +61,12 @@ logEvent(string $message, int $type)
 
 Logs an email to the file specified in db\_con/<hostname>.php. If $type is 5 then emails the error to the email address specified in the above file.
 
-$type:
-1 = Information
-2 = Audit
-3 = Security
-4 = Debug
-5 = Error
+    $type:
+    1 = Information
+    2 = Audit
+    3 = Security
+    4 = Debug
+    5 = Error
 
 
 mailSend(string $subject, string $mailBody, string $from)
