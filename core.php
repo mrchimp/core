@@ -33,7 +33,7 @@ class Core {
     }
 		
     if (@!include 'db_con/'.HOST.'.php') {
-      die('Database server is not configured on this server.');
+      die('Config file for host "'.HOST.'" not found.');
     }
     
     self::$_dsn  = DSN;
