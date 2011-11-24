@@ -184,7 +184,7 @@ class Core {
    * @param string $what the action which was timed, e.g. a function name, page name, db query.
    * Example usage: getTime($_SERVER['PHP_SELF']);
    */
-  public function getTime($what = null) {
+  public function getTime() {
     $mtime = microtime();
     $mtime = explode(" ",$mtime);
     $mtime = $mtime[1] + $mtime[0];
