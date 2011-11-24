@@ -116,30 +116,42 @@ class Core {
       return '<p>That wasn\'t an array.</p>';
     }
     $o = '';
-    $o .= '<div style="border:1px solid #333333;padding:5px;margin:20px;background-color:';
-    $o .= $this->depthHex($depth) . ';">';
-    $o .= 'array(' . sizeof($array) . ') {<br>';
+    $o .= '<div style="border:1px solid #333333;padding:5px;margin:20px;background-color:' . $this->depthHex($depth) . ';">';
+
+    // write number of elements in array
+    $o .= 'array('.sizeof($array).') {<br>';
+
+    // For each item in array
     foreach($array as $key=>$value) {
-      $o .= '<div style="border:1px solid #333333;padding:5px;margin:5px;background-color:';
-      $o .= $this->depthHex($depth+2) . ';">';
+      $o .= '<div style="border:1px solid #333333;padding:5px;margin:5px;background-color:' . $this->depthHex($depth+2) . ';">';
+      
+      // indent
       for ($x=0;$x<$depth;$x++) {
         $o .= '&nbsp;&nbsp;&nbsp;&nbsp;';
       }
+      
+      // Write value's variable type
       $o .= '[' . (gettype($key) == 'string' ? '"' : '') . $key;
       $o .= (gettype($key) == 'string' ? '"' : '' ) . '] => ';
-      if (gettype($value) == 'array') {
-        if ($key == 'GLOBALS') {
-          $o .=  '$_GLOBALS [not showing to avoid infinite recursion]';
-        } else {
-          if ($recurse==true){
-            $o .= $this->writeArrayNicely($value, true, ($depth+3));
+      
+      // Write value
+      switch (gettype($value)) {
+        case 'array':
+          if ($key == 'GLOBALS') {
+            $o .=  '$_GLOBALS [not showing to avoid infinite recursion]';
+          } else {
+            if ($recurse==true){
+              $o .= $this->writeArrayNicely($value, true, ($depth+3));
+            }
           }
-        }
-      } elseif (gettype($value) == 'object') {
-        $o .=  'Object';
-      } else {
-        $o .=  gettype($value) . ' (' . sizeof($value) . ') "' . strval($value) . '"';
+          break;
+        case 'object':
+          $o .=  'Object';
+          break;
+        default:
+          $o .=  gettype($value) . ' (' . sizeof($value) . ') "' . strval($value) . '"';
       }
+
       $o .=  '<br></div>';
     }
     
