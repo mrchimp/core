@@ -32,7 +32,7 @@ class Core {
       define('HOST', $host);
     }
 		
-    if (@!include 'db_con/'.HOST.'.php') {
+    if (@!require 'db_con/'.HOST.'.php') {
       die('Config file for host "'.HOST.'" not found.');
     }
     
