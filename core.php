@@ -13,7 +13,7 @@
  *
  */
  
- // I'm putting this line in to test twitter/github integration. Delete me! and again. and again
+ // I'm putting this line in to test twitter/github integration.
 
 class Core {
 
