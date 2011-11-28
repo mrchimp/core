@@ -13,9 +13,6 @@
  *
  */
  
- // I'm putting this line in to test twitter/github integration.
- // Ok think I've cracked it this time
-
 class Core {
 
   public $dbh;
