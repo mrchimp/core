@@ -12,7 +12,9 @@
  * @license	Unlicensed
  *
  */
-  
+ 
+ // I'm putting this line in to test twitter/github integration. Delete me!
+
 class Core {
 
   public $dbh;
