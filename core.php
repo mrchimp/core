@@ -32,7 +32,7 @@ class Core {
       define('HOST', $host);
     }
 		
-    if (@!require 'db_con/'.HOST.'.php') {
+    if (@!require_once 'db_con/'.HOST.'.php') {
       die('Config file for host "'.HOST.'" not found.');
     }
     
@@ -78,9 +78,15 @@ class Core {
   public function executeSQL($sql, $params = array()) {
     try {
       $stmt = $this->dbh->prepare($sql);
-      if (empty($params)) { $stmt->execute(); } 
-      else { $stmt->execute($params); }
+      
+      if (empty($params)) { 
+        $stmt->execute(); 
+      } else { 
+        $stmt->execute($params);
+      }
+
       //$stmt->debugDumpParams();
+
       return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch(PDOException $e) {
       $this->logEvent("An error has occured in the executeSQL Function. 
@@ -112,18 +118,23 @@ class Core {
    * @param int   $depth   do not set manually. used when the function calls itself
    */
   public function writeArrayNicely($array, $recurse=true, $depth=1) {
+    echo '<style>.nicearray {
+           border:  1px solid #333333;
+           padding: 5px;
+           margin:  20px; 
+          }</style>';
     if (!is_array($array)) {
       return '<p>That wasn\'t an array.</p>';
     }
     $o = '';
-    $o .= '<div style="border:1px solid #333333;padding:5px;margin:20px;background-color:' . $this->depthHex($depth) . ';">';
+    $o .= '<div class="nicearray" style="background-color:' . $this->depthHex($depth) . ';">';
 
     // write number of elements in array
     $o .= 'array('.sizeof($array).') {<br>';
 
     // For each item in array
     foreach($array as $key=>$value) {
-      $o .= '<div style="border:1px solid #333333;padding:5px;margin:5px;background-color:' . $this->depthHex($depth+2) . ';">';
+      $o .= '<div class="nicearray" style="background-color:' . $this->depthHex($depth+2) . ';">';
       
       // indent
       for ($x=0;$x<$depth;$x++) {
@@ -134,6 +145,8 @@ class Core {
       $o .= '[' . (gettype($key) == 'string' ? '"' : '') . $key;
       $o .= (gettype($key) == 'string' ? '"' : '' ) . '] => ';
       
+      echo var_dump($key) . '=>' . var_dump($value);
+
       // Write value
       switch (gettype($value)) {
         case 'array':
@@ -145,9 +158,11 @@ class Core {
             }
           }
           break;
+
         case 'object':
           $o .=  'Object';
           break;
+
         default:
           $o .=  gettype($value) . ' (' . sizeof($value) . ') "' . strval($value) . '"';
       }
@@ -173,10 +188,10 @@ class Core {
    * @return string the generated hex color, including leading #
    */
   private function depthHex($depth) {
-    $color_val = (16 - ($depth * 1));
-    if ($color_val < 0) { $color_val = 0; }
-    $color_val = dechex($color_val);
-    $color = "#$color_val$color_val$color_val";
+    $val = (16 - ($depth * 1));
+    if ($val < 0) { $val = 0; }
+    $val = dechex($val);
+    $color = "#$val$val$val";
     return $color;
   }	
 
@@ -231,6 +246,7 @@ class Core {
    */
   public function logEvent($msg, $type) { 
     $str = '['.date("D M d G:i:s Y").'] ';
+
     switch ($type) {
       case 1:
         $str .= ('[info] ');
@@ -247,10 +263,13 @@ class Core {
       case 5:
         $str .= ('[error] ');
         break;
-      }
+    }
+
     $str .= '[client '.$_SERVER['REMOTE_ADDR'].'] ';
     $str .= $msg . "\n";
+
     error_log($str, 3, LOG_FILE);
+
     if($type == 5) {
       $this->mailSend("Fatal Error: " . $_SERVER['HTTP_HOST'], $str);
     }
@@ -268,15 +287,22 @@ class Core {
    * @param string $mail_body the body text of the email
    *
    * Assumes all inputs have been validated
-   * This needs to be secured!! 'TO:', 'CC:', 'CCO:' or 'Content-Type' should be stripped from $mail_body.
-   * ***DO NOT*** set logEvent $type=5. It might cause the mailSend function to call itself infinitely.
-   * There is no decent error handling for this function.  Try/catch will not work. The error procuded is output and not classed as an exception.
-   * Look in to set_error_handler. 
+   * This needs to be secured!! 'TO:', 'CC:', 'CCO:' or 'Content-Type' should 
+   * be stripped from $mail_body. 
+   * ***DO NOT*** set logEvent $type=5. It might cause the mailSend function 
+   * to call itself infinitely. There is no decent error handling for this 
+   * function.  Try/catch will not work. The error produced is output and
+   * not classed as an exception. Look in to set_error_handler. 
    */
   public function mailSend($subject, $mail_body, $from = NULL) {
     $recipient = EMAIL;
-    if (empty($from)) { $header = 'From: ' . EMAIL; } 
-    else { $header = 'From: ' . $from; }
+    
+    if (empty($from)) { 
+      $header = 'From: ' . EMAIL; 
+    } else { 
+      $header = 'From: ' . $from; 
+    }
+
     if(@mail($recipient, $subject, $mail_body, $header)) {
       return true;
     } else {
