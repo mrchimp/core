@@ -26,11 +26,8 @@ class Core {
    * Constructor. This is a singleton so do not use. Call getInstance instead.
    */
   private function __construct ($host = null) {
-    if ($host == null) {
-      define('HOST', $_SERVER['SERVER_NAME']);
-    } else {
-      define('HOST', $host);
-    }
+    if ($host == null) $host = $_SERVER['SERVER_NAME'];
+    define('HOST', $host);
 		
     if (@!require_once 'db_con/'.HOST.'.php') {
       die('Config file for host "'.HOST.'" not found.');
@@ -79,11 +76,7 @@ class Core {
     try {
       $stmt = $this->dbh->prepare($sql);
       
-      if (empty($params)) { 
-        $stmt->execute(); 
-      } else { 
-        $stmt->execute($params);
-      }
+      empty($params) ?  $stmt->execute() : $stmt->execute($params);
 
       //$stmt->debugDumpParams();
 
@@ -104,7 +97,7 @@ class Core {
    */
   public function write($var, $name='') {
     echo '<pre>';
-    if (!empty($name)) { echo '$', $name, ': '; }
+    if (!empty($name)) echo '$', $name, ': ';
     var_dump($var);
     echo '</pre>';
   }
@@ -123,9 +116,8 @@ class Core {
            padding: 5px;
            margin:  20px; 
           }</style>';
-    if (!is_array($array)) {
-      return '<p>That wasn\'t an array.</p>';
-    }
+    if (!is_array($array)) return '<p>That wasn\'t an array.</p>';
+
     $o = '';
     $o .= '<div class="nicearray" style="background-color:' . $this->depthHex($depth) . ';">';
 
@@ -189,7 +181,7 @@ class Core {
    */
   private function depthHex($depth) {
     $val = (16 - ($depth * 1));
-    if ($val < 0) { $val = 0; }
+    if ($val < 0) $val = 0;
     $val = dechex($val);
     $color = "#$val$val$val";
     return $color;
@@ -298,11 +290,7 @@ class Core {
   public function mailSend($subject, $mail_body, $from = NULL) {
     $recipient = EMAIL;
     
-    if (empty($from)) { 
-      $header = 'From: ' . EMAIL; 
-    } else { 
-      $header = 'From: ' . $from; 
-    }
+    $header = 'From: ' . (empty($from) ? EMAIL : $from);
 
     if(@mail($recipient, $subject, $mail_body, $header)) {
       return true;
