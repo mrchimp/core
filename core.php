@@ -44,8 +44,8 @@ class Core {
       $this->dbh = new PDO(self::$_dsn,self::$_user,self::$_pass);
       $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     } catch (PDOException $e) {
-      $this->logEvent("Unable to establish a database connection: " . $e->getMessage(), 5);
-      header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
+      $this->logEvent("Unable to establish a database connection: ".$e->getMessage(), 5);
+      header($_SERVER['SERVER_PROTOCOL'].' 500 Internal Server Error', true, 500);
       exit(0);
     }
   }
@@ -67,14 +67,14 @@ class Core {
   }
   
   /**
-  * Process sql statments using PDO
-  *
-  * Author: Daniel Hewes
-  * Date: October 2011
-  *
-  * @param string $sql	the SQL to be processed
-  * @param array $params the parameters to bind (optional)
-  */
+   * Process sql statements using PDO
+   *
+   * Author: Daniel Hewes
+   * Date: October 2011
+   *
+   * @param string $sql	the SQL to be processed
+   * @param array  $params the parameters to bind (optional)
+   */
   public function executeSQL($sql, $params = array()) {
     try {
       $stmt = $this->dbh->prepare($sql);
@@ -183,8 +183,8 @@ class Core {
    *
    * Used by WriteArrayNicely().
    *
-   * @param int $depth the level of nesting. The higher the number the darker 
-   *                   the resulting colour.
+   * @param int $depth the level of nesting. 
+   *                   The higher the number the darker the resulting colour.
    * @return string the generated hex color, including leading #
    */
   private function depthHex($depth) {
@@ -207,9 +207,10 @@ class Core {
 
   /**
    * Returns the number of seconds elapsed since startTimer() was called
-   * 
-   * @param string $what the action which was timed, e.g. a function name, page name, db query.
    * Example usage: getTime($_SERVER['PHP_SELF']);
+   * 
+   * @param string $what the action which was timed 
+   *                     e.g. a function name, page name, db query.
    */
   public function getTime() {
     $mtime = microtime();
