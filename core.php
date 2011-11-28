@@ -128,45 +128,36 @@ class Core {
     foreach($array as $key=>$value) {
       $o .= '<div class="nicearray" style="background-color:' . $this->depthHex($depth+2) . ';">';
       
-      // indent
-      for ($x=0;$x<$depth;$x++) {
-        $o .= '&nbsp;&nbsp;&nbsp;&nbsp;';
-      }
-      
       // Write value's variable type
       $o .= '[' . (gettype($key) == 'string' ? '"' : '') . $key;
       $o .= (gettype($key) == 'string' ? '"' : '' ) . '] => ';
       
-      echo var_dump($key) . '=>' . var_dump($value);
+      echo '###'.var_dump($key) . '=>' . var_dump($value).'###';
 
       // Write value
       switch (gettype($value)) {
         case 'array':
-          if ($key == 'GLOBALS') {
-            $o .=  '$_GLOBALS [not showing to avoid infinite recursion]';
-          } else {
+          //if ($key == 'GLOBALS') {
+          //  $o .=  '$_GLOBALS [not showing to avoid infinite recursion]';
+          //} else {
             if ($recurse==true){
               $o .= $this->writeArrayNicely($value, true, ($depth+3));
             }
-          }
+          //}
           break;
 
         case 'object':
-          $o .=  'Object';
+          $o .= 'Object';
           break;
 
         default:
-          $o .=  gettype($value) . ' (' . sizeof($value) . ') "' . strval($value) . '"';
+          $o .= gettype($value).' ('.sizeof($value).') "'.strval($value).'"';
       }
 
-      $o .=  '<br></div>';
+      $o .= '<br></div>';
     }
-    
-    for ($x=1;$x<$depth;$x++) {
-      $o .=  '&nbsp;&nbsp;&nbsp;&nbsp;';
-    }
-    
-    $o .=  '}</div>';
+
+    $o .= '}</div>';
     return $o;
   }
 
