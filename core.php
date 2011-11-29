@@ -100,16 +100,17 @@ class Core {
    * @param string $name the name of the variable being written (optional)
    */
   public function write($var, $name='') {
-    echo '<pre>';
-    if (!empty($name)) echo '$', $name, ': ';
+    echo '<pre>DUMPING VAR';
+    if (!empty($name)) echo " '$name': ";
+    echo '{{{<br>';
     $raw_var = print_r($var, true);
     $raw_var = htmlspecialchars($raw_var);
     echo $raw_var;
-    echo '</pre>';
+    echo '}}}</pre>';
   }
 
   /**
-   * Echo an array's contents within nested divs
+   * Return an array's contents within nested divs
    *
    * @param array $array   the array to be written
    * @param bool  $recurse set to false to only write the first 
@@ -118,6 +119,7 @@ class Core {
    *                       calling itself.
    * @param int   $depth   do not set manually. used when the 
    *                       function calls itself
+   * @return string        the generated string
    */
   public function writeArrayNicely($array, $recurse=true, $depth=1) {
     $o = '';
@@ -154,7 +156,7 @@ class Core {
       
       // Write value
       if (is_array($value)) {
-        if ($key == 'GLOBALS') {
+        if ($key === 'GLOBALS') {
           $o .=  '$_GLOBALS [not showing to avoid infinite recursion]';
         } else {
           if ($recurse==true) {

@@ -35,7 +35,11 @@ var\_dump()s $var between PRE tags. If $name is specified it will be written out
 writeArrayNicely(array $array, bool $recurse=true)
 ----------------------------------------------------------------
 
-Takes an array and writes it in nested divs with greyscale backgrounds representing the depth within the array. Works with n-dimension arrays. Set $recurse to false to prevent it writing out the contents of arrays within the array. This is to prevent an infinite loop if the arraycontains a reference to itself or something weird like that. There's a hack to prevent this happening when writing out $\_GLOBALS but this could be fixed to prevent this happening with any array.
+Takes an array and writes it in nested divs with greyscale backgrounds representing the depth within the array. Works with n-dimension arrays. 
+
+Set $recurse to false to prevent it writing out the contents of arrays within the array.
+
+THIS FUNCTION WILL BREAK if you pass it an array which contains a reference to itself as this will cause an infinite recursion. A hack is included to allow $GLOBALS to be passed to it - basically anything with the key 'GLOBALS' will not be written out. Testing for references in PHP is hard.
 
 
 startTimer()

@@ -9,12 +9,14 @@
 <?php
   
   /**
-   * Test page for Core.php
+   * Test and example page for Core.php
    */
+
+
 
   //============= Setting up ==============================
 
-  // Define this - helps prevent unwanted hacks
+  // Define IN_SCRIPT
   define('IN_SCRIPT', 'what the hell');
 
   // include the class definition
@@ -29,14 +31,26 @@
 
 
   // =============== Write out some arrays ==================
+  $test = array(1, 
+                2, 
+                'foo', 
+                'bar', 
+                array(5, 6, 7), 
+                $core,
+                'this' => 'that',
+                'true' => false);
 
-  $test = array(1, 2, 'foo', 'bar', array(5, 6, 7), $core);
-  $test['this'] = 'that';
-  $test['true'] = false;
+  echo '<h2>Using write()</h2>';
+  echo $core->write($test, 'test');
 
-  echo $core->write($test);
+  echo '<h2>Using writeArrayNicely()</h2>';
   echo $core->writeArrayNicely($test);
-  echo $core->writeArraynicely($GLOBALS);
+
+  // Note: The globals variable contains a reference to itself
+  //       writeArrayNicely() contains a workaround to prevent
+  //       infinite recursion. However this only works for the
+  //       $GLOBALS array - it's not a generic fix!
+  echo $core->writeArrayNicely($GLOBALS);
 
 
 
