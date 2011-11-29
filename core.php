@@ -1,4 +1,8 @@
-<?php if (!defined('IN_SCRIPT')) { header($_SERVER['SERVER_PROTOCOL'] . " 404 Not Found"); exit(0); }
+<?php 
+  if (!defined('IN_SCRIPT')) { 
+    header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found');
+    exit(0);
+  } 
 
 /**
  * Database connection and helper function class
@@ -30,7 +34,7 @@ class Core {
     define('HOST', $host);
 		
     if (@!require_once 'db_con/'.HOST.'.php') {
-      die('Config file for host "'.HOST.'" not found.');
+      trigger_error('Config file for host "'.HOST.'" not found.', E_USER_ERROR);
     }
     
     self::$_dsn  = DSN;
@@ -56,11 +60,11 @@ class Core {
    * @return object
    */
   public static function getInstance() {
-  if(!isset(self::$_instance)){
-    $object= __CLASS__;
-    self::$_instance=new $object;
-  }
-  return self::$_instance;
+    if(!isset(self::$_instance)){
+      $object= __CLASS__;
+      self::$_instance=new $object;
+    }
+    return self::$_instance;
   }
   
   /**
@@ -76,7 +80,7 @@ class Core {
     try {
       $stmt = $this->dbh->prepare($sql);
       
-      empty($params) ?  $stmt->execute() : $stmt->execute($params);
+      empty($params) ? $stmt->execute() : $stmt->execute($params);
 
       //$stmt->debugDumpParams();
 
@@ -98,7 +102,9 @@ class Core {
   public function write($var, $name='') {
     echo '<pre>';
     if (!empty($name)) echo '$', $name, ': ';
-    var_dump($var);
+    $raw_var = print_r($var, true);
+    $raw_var = htmlspecialchars($raw_var);
+    echo $raw_var;
     echo '</pre>';
   }
 
@@ -106,58 +112,73 @@ class Core {
    * Echo an array's contents within nested divs
    *
    * @param array $array   the array to be written
-   * @param bool  $recurse set to false to only write the first layer of the array.
-   *                       Prevents the function from recursively calling itself.
-   * @param int   $depth   do not set manually. used when the function calls itself
+   * @param bool  $recurse set to false to only write the first 
+   *                       layer of the array.
+   *                       Prevents the function from recursively 
+   *                       calling itself.
+   * @param int   $depth   do not set manually. used when the 
+   *                       function calls itself
    */
   public function writeArrayNicely($array, $recurse=true, $depth=1) {
-    echo '<style>.nicearray {
-           border:  1px solid #333333;
-           padding: 5px;
-           margin:  20px; 
-          }</style>';
-    if (!is_array($array)) return '<p>That wasn\'t an array.</p>';
-
     $o = '';
-    $o .= '<div class="nicearray" style="background-color:' . $this->depthHex($depth) . ';">';
+
+    if ($depth == 1) {
+      $o .= '<style>
+            .nicearray {
+              border:  1px solid #333333;
+              padding: 5px;
+              margin:  10px 10px 10px 20px; 
+            }
+            </style>';
+    }
+
+    if (!is_array($array)) return '<p>That wasn\'t an array.</p>';
+    
+    if ($depth == 1) {
+      $o .= '<div class="nicearray" style="background-color:'.$this->depthHex($depth).';">';
+    }
 
     // write number of elements in array
-    $o .= 'array('.sizeof($array).') {<br>';
+    $o .= 'array('.sizeof($array).')<br>';
 
     // For each item in array
     foreach($array as $key=>$value) {
-      $o .= '<div class="nicearray" style="background-color:' . $this->depthHex($depth+2) . ';">';
+      $o .= '<div class="nicearray" style="background-color:'.$this->depthHex($depth+2).';">';
       
       // Write value's variable type
-      $o .= '[' . (gettype($key) == 'string' ? '"' : '') . $key;
-      $o .= (gettype($key) == 'string' ? '"' : '' ) . '] => ';
+      if (gettype($key) == 'string') {
+        $o .= '[\''.$key.'\'] =&gt; ';
+      } else {
+        $o .= '['.$key.'] =&gt; ';
+      }
       
-      echo '###'.var_dump($key) . '=>' . var_dump($value).'###';
-
       // Write value
-      switch (gettype($value)) {
-        case 'array':
-          //if ($key == 'GLOBALS') {
-          //  $o .=  '$_GLOBALS [not showing to avoid infinite recursion]';
-          //} else {
-            if ($recurse==true){
-              $o .= $this->writeArrayNicely($value, true, ($depth+3));
-            }
-          //}
-          break;
-
-        case 'object':
-          $o .= 'Object';
-          break;
-
-        default:
-          $o .= gettype($value).' ('.sizeof($value).') "'.strval($value).'"';
+      if (is_array($value)) {
+        if ($key == 'GLOBALS') {
+          $o .=  '$_GLOBALS [not showing to avoid infinite recursion]';
+        } else {
+          if ($recurse==true) {
+            $o .= $this->writeArrayNicely($value, true, ($depth+1));
+          }
+        }
+      } else if (is_object($value)) {
+        $o .= 'object - instance of '.get_class($value);
+      } else if (is_bool($value)) {
+        $o .= 'boolean(1) '.($value ? 'True' : 'False');
+      } else if (is_string($value)) {
+        $o .= 'string('.strlen($value).') \''.strval($value).'\'';
+      } else if (is_int($value)) {
+        $o .= 'integer: '.strval($value);
+      } else {
+        $o .= gettype($value).': "'.strval($value).'"';
       }
 
-      $o .= '<br></div>';
+      $o .= '</div>';
     }
 
-    $o .= '}</div>';
+    if ($depth == 1) {
+      $o .= '</div>';
+    }
     return $o;
   }
 
@@ -176,7 +197,7 @@ class Core {
     $val = dechex($val);
     $color = "#$val$val$val";
     return $color;
-  }	
+  }
 
   /**
    * Starts a millisecond-accurate timer
