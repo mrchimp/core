@@ -30,11 +30,16 @@ class Core {
    * Constructor. This is a singleton so do not use. Call getInstance instead.
    */
   private function __construct ($host = null) {
+  
+    set_error_handler(array($this, 'myErrHandler'));
+  
     if ($host == null) $host = $_SERVER['SERVER_NAME'];
     define('HOST', $host);
 		
     if (@!require_once 'db_con/'.HOST.'.php') {
-      trigger_error('Config file for host "'.HOST.'" not found.', E_USER_ERROR);
+      //trigger_error is not called if the file is not found. myErrHandler handles the error first without using trigger_error.
+      //Not sure why.
+      //trigger_error('Config file for host "'.HOST.'" not found.', E_USER_ERROR);
     }
     
     self::$_dsn  = DSN;
@@ -45,8 +50,7 @@ class Core {
       $this->dbh = new PDO(self::$_dsn,self::$_user,self::$_pass);
       $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     } catch (PDOException $e) {
-      $this->logEvent("Unable to establish a database connection: ".$e->getMessage(), 5);
-      header($_SERVER['SERVER_PROTOCOL'].' 500 Internal Server Error', true, 500);
+      trigger_error('Unable to establish a database connection: '.$e->getMessage(), E_USER_ERROR);
       exit(0);
     }
   }
@@ -86,9 +90,8 @@ class Core {
 
       return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch(PDOException $e) {
-      $this->logEvent("An error has occured in the executeSQL Function. 
-                        Error acquiring data: " . $e->getMessage(), 5);
-      header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
+      trigger_error('An error has occured in the executeSQL Function. 
+                        Error acquiring data: ' . $e->getMessage(), E_USER_ERROR);
       exit(0);
     }
   }
@@ -313,4 +316,31 @@ class Core {
       return false;
     }
   }
+  
+  /**
+   * Error handler for all function within core class.
+   *
+   * @param int $errCode
+   * @param str $errCode
+   * @param str $errFile
+   * @param int $errLine
+   */
+  private function myErrHandler($errCode, $errStr, $errFile, $errLine) {
+    
+    $err = sprintf("PHP %s:  %s in %s on line %d\n", $errCode, $errStr, $errFile, $errLine);
+    
+    if (ini_get("display_errors")) { //Only turn on for development
+      print($err);
+    } else { //Display errors is turned off. What to do? re-direct? generic error?
+      echo('An error has occured.');
+    }
+    
+    if (ini_get('log_errors')) { //Should be turned on at all times.
+      error_log($err, 0);
+      if($errCode == E_USER_ERROR || E_ERROR) {
+        //$this->mailSend("Fatal Error: " . $_SERVER['HTTP_HOST'], $err);
+      }
+    }
+    return true;
+  } 
 }
