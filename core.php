@@ -12,7 +12,8 @@
  * LICENSE: Unlicensed
  *
  * @author	Jake Gully <jake@deviouschimp.co.uk>
- * @copyright	2011 Jake Gully
+ * @author      Daniel Hewes <daniel@danimalweb.co.uk>
+ * @copyright	2011 Jake Gully and Daniel Hewes
  * @license	Unlicensed
  *
  */
@@ -30,17 +31,12 @@ class Core {
    * Constructor. This is a singleton so do not use. Call getInstance instead.
    */
   private function __construct ($host = null) {
-  
-    set_error_handler(array($this, 'myErrHandler'));
+    set_error_handler(array($this, 'coreErrorHandler'));
   
     if ($host == null) $host = $_SERVER['SERVER_NAME'];
     define('HOST', $host);
 		
-    if (@!require_once 'db_con/'.HOST.'.php') {
-      //trigger_error is not called if the file is not found. myErrHandler handles the error first without using trigger_error.
-      //Not sure why.
-      //trigger_error('Config file for host "'.HOST.'" not found.', E_USER_ERROR);
-    }
+    require_once 'db_con/'.HOST.'.php';
     
     self::$_dsn  = DSN;
     self::$_user = DBUSER;
@@ -74,8 +70,8 @@ class Core {
   /**
    * Process sql statements using PDO
    *
-   * Author: Daniel Hewes
-   * Date: October 2011
+   * @author    Daniel Hewes
+   * @date      October 2011
    *
    * @param string $sql	the SQL to be processed
    * @param array  $params the parameters to bind (optional)
@@ -243,8 +239,8 @@ class Core {
   /**
    * Log a string to file
    *
-   * Author: Daniel Hewes
-   * Date: October 2011
+   * @author Daniel Hewes
+   * @date   October 2011
    *
    * @param string $msg	the string to be logged
    * @param int $type the type of message 
@@ -290,8 +286,8 @@ class Core {
    *
    * Used by logToFile().
    *
-   * Author: Daniel Hewes
-   * Date: October 2011
+   * @author Daniel Hewes
+   * @date   October 2011
    *
    * @param string $subject	the subject of the email
    * @param string $mail_body the body text of the email
@@ -306,8 +302,7 @@ class Core {
    */
   public function mailSend($subject, $mail_body, $from = NULL) {
     $recipient = EMAIL;
-    
-    $header = 'From: ' . (empty($from) ? EMAIL : $from);
+    $header    = 'From: ' . (empty($from) ? EMAIL : $from);
 
     if(@mail($recipient, $subject, $mail_body, $header)) {
       return true;
@@ -320,27 +315,57 @@ class Core {
   /**
    * Error handler for all function within core class.
    *
-   * @param int $errCode
-   * @param str $errCode
-   * @param str $errFile
-   * @param int $errLine
+   * @param int $err_code the numeric error code
+   * @param str $err_str  description of the error
+   * @param str $err_file the name of the file that contains the error
+   * @param int $err_line the line number of the error
    */
-  private function myErrHandler($errCode, $errStr, $errFile, $errLine) {
+  private function coreErrorHandler($err_code, $err_str, $err_file, $err_line) {
+    $err = sprintf("PHP %s:  %s in %s on line %d\n", $err_code, $err_str, $err_file, $err_line);
     
-    $err = sprintf("PHP %s:  %s in %s on line %d\n", $errCode, $errStr, $errFile, $errLine);
-    
-    if (ini_get("display_errors")) { //Only turn on for development
+    if ($this->isDebugOn()) {
       print($err);
     } else { //Display errors is turned off. What to do? re-direct? generic error?
-      echo('An error has occured.');
+      echo 'Computer says no.';
+      exit();
     }
     
     if (ini_get('log_errors')) { //Should be turned on at all times.
       error_log($err, 0);
-      if($errCode == E_USER_ERROR || E_ERROR) {
-        //$this->mailSend("Fatal Error: " . $_SERVER['HTTP_HOST'], $err);
+      if($err_code == E_USER_ERROR || $err_code == E_ERROR) {
+        if (!$this->isDebugOn()) {
+          //$this->mailSend("Fatal Error: " . $_SERVER['HTTP_HOST'], $err);
+        }
       }
     }
     return true;
-  } 
+  }
+
+
+  /**
+   * turns debug mode on or off
+   *
+   * @param bool $onoff if true debug mode is turned on, if 
+   *                    false debug mode is disabled
+   */
+  private function setDebug($onoff) {
+    if ($onoff) {
+      ini_set('display_errors', 1);
+    } else {
+      ini_set('display_errors', 0);
+    }
+  }
+
+  /**
+   * gets debug mode's status
+   *
+   * @return bool true if debug mode is enabled
+   */
+  private function isDebugOn() {
+    if (ini_get('display_errors')) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
