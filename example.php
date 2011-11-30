@@ -96,13 +96,7 @@
   echo 'Selecting some data... ';
   $select_sql = 'SELECT id, name FROM test_table';
 
-  try {
-    $stmt   = $core->dbh->prepare($select_sql);
-    $stmt->execute();
-    $data   = $stmt->fetchAll();
-  } catch (PDOException $e) {
-    die('Error selecting data. '.$e->getMessage());
-  }
+  $data = $core->executeSQL($select_sql);
 
   if (empty($data)) {
     die('No results found.1');
@@ -124,12 +118,7 @@
 
   $delete_sql = 'DELETE FROM test_table';
 
-  try {
-    $stmt = $core->dbh->prepare($delete_sql);
-    $result = $stmt->execute();
-  } catch (PDOException $e) {
-    die('Error deleting data. '.$e->getMessage());
-  }
+  $result = $core->dbh->query($delete_sql);
 
   echo 'Success! <br>';
 
