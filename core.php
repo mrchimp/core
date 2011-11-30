@@ -12,7 +12,7 @@
  * LICENSE: Unlicensed
  *
  * @author	Jake Gully <jake@deviouschimp.co.uk>
- * @author      Daniel Hewes <daniel@danimalweb.co.uk>
+ * @author  Daniel Hewes <daniel@danimalweb.co.uk>
  * @copyright	2011 Jake Gully and Daniel Hewes
  * @license	Unlicensed
  *
@@ -239,9 +239,6 @@ class Core {
   /**
    * Log a string to file
    *
-   * @author Daniel Hewes
-   * @date   October 2011
-   *
    * @param string $msg	the string to be logged
    * @param int $type the type of message 
    *		1:Information
@@ -286,9 +283,6 @@ class Core {
    *
    * Used by logToFile().
    *
-   * @author Daniel Hewes
-   * @date   October 2011
-   *
    * @param string $subject	the subject of the email
    * @param string $mail_body the body text of the email
    *
@@ -321,26 +315,35 @@ class Core {
    * @param int $err_line the line number of the error
    */
   private function coreErrorHandler($err_code, $err_str, $err_file, $err_line) {
-    $err = sprintf("PHP %s:  %s in %s on line %d\n", $err_code, $err_str, $err_file, $err_line);
+    $error_type = array (
+                  E_WARNING       => 'Warning',
+                  E_NOTICE        => 'Notice',
+                  E_USER_ERROR    => 'User Error',
+                  E_USER_WARNING  => 'User Warning',
+                  E_USER_NOTICE   => 'User Notice');
+  
+    $err = sprintf('PHP %s:  %s in %s on line %d ', $error_type[$err_code], $err_str, $err_file, $err_line);
+    $err .= '[client '.$_SERVER['REMOTE_ADDR'].']';
+    $err .= "\n";
     
-    if ($this->isDebugOn()) {
-      print($err);
-    } else { //Display errors is turned off. What to do? re-direct? generic error?
-      echo 'Computer says no.';
-      exit();
-    }
-    
-    if (ini_get('log_errors')) { //Should be turned on at all times.
+    if (ini_get('log_errors')) {
       error_log($err, 0);
-      if($err_code == E_USER_ERROR || $err_code == E_ERROR) {
+      if($err_code == E_USER_ERROR) {
         if (!$this->isDebugOn()) {
-          //$this->mailSend("Fatal Error: " . $_SERVER['HTTP_HOST'], $err);
+          //$this->mailSend('Fatal Error: '.$_SERVER['HTTP_HOST'].' '.date("Y-m-d H:i:s (T)"), $err);
         }
       }
     }
+    
+    if ($this->isDebugOn()) {
+      print($err);
+    } else { //PRODUCTION
+      echo 'Computer says no.';
+      exit(0);
+    }
+    
     return true;
   }
-
 
   /**
    * turns debug mode on or off
