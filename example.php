@@ -26,10 +26,9 @@
   $core = Core::getInstance();
 
   $core->startTimer();
-
-
-
-
+  
+  
+  
   // =============== Write out some arrays ==================
   $test = array(1, 
                 2, 
@@ -53,16 +52,16 @@
   echo $core->writeArrayNicely($GLOBALS);
 
 
-
-
+  
+  
   // ================ Create table for test data ==========
   echo 'Creating test table... ';
   $create_sql = 'CREATE TABLE IF NOT EXISTS test_table 
                   (
-                    id INTEGER PRIMARY KEY ASC AUTOINCREMENT, 
+                    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
                     name TEXT
                   )';
-  $result = $core->dbh->query($create_sql);
+  $result = $core->executeSQL($create_sql);
   if ($result) {
     echo 'Success!<br>';
   } else {
@@ -72,6 +71,7 @@
 
 
 
+  
   // ================ Insert some data ====================
   echo 'Inserting some user data... ';
   $insert_sql = "INSERT 
@@ -80,53 +80,53 @@
                  VALUES
                    ('Alice')";
 
-  try {
-    $stmt = $core->dbh->prepare($insert_sql);
-    $stmt->execute();
-  } catch (PDOException $e) {
-    die('Error inserting names. '.$e->getMessage());
+  $result = $core->executeSQL($insert_sql);
+  if ($result) {
+    echo 'Success!<br>';
+  } else {
+    echo 'Error inserting names. Exiting...';
+    exit();
   }
 
-  echo 'Success! <br>';
- 
+  
 
-
-
+  
   // ================ Select some data ====================
   echo 'Selecting some data... ';
   $select_sql = 'SELECT id, name FROM test_table';
 
   $data = $core->executeSQL($select_sql);
 
-  if (empty($data)) {
-    die('No results found.1');
-  }
-
-  echo 'Success! <br>';
-
-  // Dump the data variable between <pre> tags
+  if (!is_array($data)) {
+    die('No results found.');
+  } else {
+    echo 'Success! <br>';
+    // Dump the data variable between <pre> tags
   $core->write($data);
 
   // Display $data in nice nested divs
   echo $core->writeArrayNicely($data);
+  }
 
 
-
-
+  
+  
   // ================ Delete the data =====================
   echo 'Deleting data... ';
 
   $delete_sql = 'DELETE FROM test_table';
 
-  $result = $core->dbh->query($delete_sql);
+  $result = $core->executeSQL($delete_sql);
 
   echo 'Success! <br>';
 
 
+  
+  
   // ================ Dropping table ======================
   echo 'Dropping test table... ';
   $drop_sql = 'DROP TABLE test_table';
-  $result = $core->dbh->query($drop_sql);
+  $result = $core->executeSQL($drop_sql);
   if ($result) {
     echo 'Success! <br>';
   } else {
@@ -134,10 +134,14 @@
     exit();
   }
 
+  
+  
+  
   // ================ Get Timer ===========================
-  echo 'That all took '.$core->getTime().' seconds. <br><br>';
+  echo '<br>That all took '.$core->getTime().' seconds. <br><br>';
   echo 'If you\'re reading this then everything worked!';
 
 ?>
 
 </body>
+</html>
