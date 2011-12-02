@@ -12,11 +12,14 @@
  * LICENSE: Unlicensed
  *
  * @author	Jake Gully <jake@deviouschimp.co.uk>
- * @author  Daniel Hewes <daniel@danimalweb.co.uk>
+ * @author    Daniel Hewes <daniel@danimalweb.co.uk>
  * @copyright	2011 Jake Gully and Daniel Hewes
+ * @link        http://github.com/mrchimp/core
  * @license	Unlicensed
- *
  */
+
+
+
  
 class Core {
 
