@@ -12,10 +12,10 @@
  * LICENSE: Unlicensed
  *
  * @author	Jake Gully <jake@deviouschimp.co.uk>
- * @author      Daniel Hewes <daniel@danimalweb.co.uk>
+ * @author  Daniel Hewes <daniel@danimalweb.co.uk>
  * @copyright	2011 Jake Gully and Daniel Hewes
- * @link        http://github.com/mrchimp/core
  * @license	Unlicensed
+ *
  */
  
 class Core {
@@ -78,16 +78,20 @@ class Core {
    */
   public function executeSQL($sql, $params = array()) {
     try {
-      $stmt = $this->dbh->prepare($sql);
+      $stmt = $this->dbh->prepare($sql); //Used by all query types.
       
-      empty($params) ? $stmt->execute() : $stmt->execute($params);
-
-      $stmt->debugDumpParams();
-
-      return $stmt->fetchAll(PDO::FETCH_ASSOC);
+      if (substr($sql, 0, 6) === "SELECT") { 
+        //Select
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC); //Returns an Array if data returned. Use is_array to check.
+      } else { 
+        //Create/Insert/Update/Delete/Drop
+        return $stmt->execute($params); //Returns true/false
+      }
+      
     } catch(PDOException $e) {
       trigger_error('An error has occured in the executeSQL Function. 
-                     Error acquiring data: ' . $e->getMessage(), E_USER_ERROR);
+                     Error acquiring data: ' . $e->getMessage() .' Debug Params: ' . $stmt->debugDumpParams(), E_USER_ERROR);
       exit(0);
     }
   }
@@ -314,10 +318,7 @@ class Core {
    * @param str $err_file the name of the file that contains the error
    * @param int $err_line the line number of the error
    */
-  public function coreErrorHandler($err_code, $err_str, $err_file, $err_line) {
-    // was set to private but was causing a "cannot access private method" 
-    // error so changed to public.
-
+  private function coreErrorHandler($err_code, $err_str, $err_file, $err_line) {
     $error_type = array (
                   E_WARNING       => 'Warning',
                   E_NOTICE        => 'Notice',
@@ -373,34 +374,5 @@ class Core {
     } else {
       return false;
     }
-  }
-
-
-  /**
-   * Replaces any parameter placeholders in a query with the value of that
-   * parameter. Useful for debugging. Assumes anonymous parameters from 
-   * $params are are in the same order as specified in $query
-   *
-   * By bigwebguy http://stackoverflow.com/q/210564/130347   
-   *
-   * @param  string $query  The sql query with parameter placeholders
-   * @param  array  $params The array of substitution parameters
-   * @return string The interpolated query
-   */
-  public static function interpolateQuery($query, $params) {
-    $keys = array();
-
-    // build a regular expression for each parameter
-    foreach ($params as $key => $value) {
-        if (is_string($key)) {
-            $keys[] = '/:'.$key.'/';
-        } else {
-            $keys[] = '/[?]/';
-        }
-    }
-
-    $query = preg_replace($keys, $params, $query, 1, $count);
-
-    return $query;
   }
 }
