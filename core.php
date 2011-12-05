@@ -94,7 +94,9 @@ class Core {
       
     } catch(PDOException $e) {
       trigger_error('An error has occured in the executeSQL Function. 
-                     Error acquiring data: ' . $e->getMessage() .' Debug Params: ' . $stmt->debugDumpParams(), E_USER_ERROR);
+                     Error acquiring data: ' . $e->getMessage() .
+                     (isset($stmt) ? 'Debug Params: ' . $stmt->debugDumpParams() : ''), 
+                     E_USER_ERROR);
       exit(0);
     }
   }
