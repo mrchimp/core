@@ -2,3 +2,4 @@
 *.swp
 db_con/*.php
 db_con/*.db
+!db_con/localhost-example.php
