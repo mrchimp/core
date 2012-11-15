@@ -1,67 +1,91 @@
-core.php
-========
+# core.php #
 
-Provides PDO connection and some helper functions.
+Manages PDO connection and provides basic debugging functions.
 
 
-Accessing PDO handler
-=====================
+## Installation ##
 
+ *  Put core/ into the root of your website.
+ *  Duplicate or rename **core/db_con/localhost-example.php** to **HOSTNAME.php**. E.g. localhost.php or example.com.php
+ *  Update this file with your connection details.
+ *  Navigate to HOSTNAME/core/example.php
+ *  If you scroll down and you will either see "everything worked!" or some errors.
+
+
+## Usage ##
+
+Setting up core in your script:
+
+    // Prevent direct access.
+    define('IN_SCRIPT', 'what the hell');
+
+    // Include the class definition
+    require_once 'core.php';
+
+    // Instantiate
     $core = Core::getInstance();
-    $core->dbh; // This is the database handler
+
+For further examples see core/example.php
 
 
-Public Methods
-==============
 
-getInstance()
--------------
+
+
+## Public Methods ##
+
+
+### getInstance() ###
+
 
 Returns an instance of Core.
 
 
-executeSQL(string $sql, array $params = array())
-------------------------------------------------
+
+### executeSQL(string $sql, array $params = array()) ###
 
 Executes SQL.
 
 
-write($var, string $name='')
-----------------------------
 
-var\_dump()s $var between PRE tags. If $name is specified it will be written out first. Sometimes handy if you're using write() a lot.
+### write($var, string $name='') ###
+
+For debugging purposes.
+
+Dumps the contents of a variable between PRE tags. If $name is specified it will be written out first. Sometimes handy if you're using write() a lot.
 
 
-writeArrayNicely(array $array, bool $recurse=true)
-----------------------------------------------------------------
+
+### writeArrayNicely(array $array, bool $recurse=true) ###
+
+For debugging purposes.
 
 Takes an array and writes it in nested divs with greyscale backgrounds representing the depth within the array. Works with n-dimension arrays. 
 
 Set $recurse to false to prevent it writing out the contents of arrays within the array.
 
-THIS FUNCTION WILL BREAK if you pass it an array which contains a reference to itself as this will cause an infinite recursion. A hack is included to allow $GLOBALS to be passed to it - basically anything with the key 'GLOBALS' will not be written out. Testing for references in PHP is hard.
+Note: A hack is included to allow $GLOBALS to be passed to this function - anything with the key 'GLOBALS' will not be written out.
 
 
-startTimer()
-------------
+
+### startTimer() ###
 
 Starts the timer.
 
 
-getTime(string $what = null)
-----------------------------
+
+### getTime(string $what = null) ###
 
 Returns the number of seconds elapsed since startTimer() was called. Returned value is a float to millisecond accuracy.
 
 
-logEventTime($event\_name) 
--------------------------
+
+### logEventTime($event\_name) ###
 
 Logs the time taken since startTimer() was called to the log file defined in the config file.
 
 
-logEvent(string $message, int $type)
-------------------------------------
+
+### logEvent(string $message, int $type) ###
 
 Logs an email to the file specified in db\_con/HOSTNAME.php. If $type is 5 then emails the error to the email address specified in the above file.
 
@@ -73,8 +97,7 @@ Logs an email to the file specified in db\_con/HOSTNAME.php. If $type is 5 then 
     5 = Error
 
 
-mailSend(string $subject, string $mailBody, string $from)
-----------------------------------------------------------
+
+### mailSend(string $subject, string $mailBody, string $from) ###
 
 Sends an email to the email address specified in db\_con/HOSTNAME.php.
-

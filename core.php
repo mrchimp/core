@@ -1,8 +1,5 @@
 <?php 
-  if (!defined('IN_SCRIPT')) { 
-    header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found');
-    exit(0);
-  } 
+  defined('IN_SCRIPT') or die('No direct access.');
 
 /**
  * Database connection and helper function class
@@ -39,7 +36,9 @@ class Core {
     if ($host == null) $host = $_SERVER['SERVER_NAME'];
     define('HOST', $host);
 		
-    require_once 'db_con/'.HOST.'.php';
+    if (!include_once('db_con/'.HOST.'.php')) {
+      die('No database config file.');
+    }
     
     self::$_dsn  = DSN;
     self::$_user = DBUSER;
@@ -93,9 +92,9 @@ class Core {
       }
       
     } catch(PDOException $e) {
-      trigger_error('An error has occured in the executeSQL Function. 
-                     Error acquiring data: ' . $e->getMessage() .
-                     (isset($stmt) ? 'Debug Params: ' . $stmt->debugDumpParams() : ''), 
+      trigger_error('Core::executeSQL() encountered a problem. 
+                     DBO says: ' . $e->getMessage() .
+                     (isset($stmt) ? ' Debug Params: ' . $stmt->debugDumpParams() : ''), 
                      E_USER_ERROR);
       exit(0);
     }
