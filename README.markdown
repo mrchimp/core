@@ -44,7 +44,11 @@ Returns an instance of Core.
 
 ### executeSQL(string $sql, array $params = array()) ###
 
-Executes SQL.
+Executes an SQL query.
+
+If the query is a SELECT query then an associative array will be returned. In all other cases a boolean is returned: true if the query was successful, false if not.
+
+$params will be passed to [PDO::execute()](http://php.net/manual/en/pdostatement.execute.php) so should be formatted appropriately.
 
 
 
@@ -88,7 +92,7 @@ Logs the time taken since startTimer() was called to the log file defined in the
 
 ### logEvent(string $message, int $type) ###
 
-Logs an email to the file specified in db\_con/HOSTNAME.php. If $type is 5 then emails the error to the email address specified in the above file.
+Logs an error to the file specified in db\_con/HOSTNAME.php. If $type is 5 then emails the error to the email address specified in the above file.
 
     $type:
     1 = Information
