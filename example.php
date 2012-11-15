@@ -19,7 +19,7 @@
    */ 
   
   // Define IN_SCRIPT
-  define('IN_SCRIPT', 'what the hell');
+  define('IN_SCRIPT', true);
 
   // include the class definition
   require_once 'core.php';

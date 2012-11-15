@@ -6,10 +6,11 @@ Manages PDO connection and provides basic debugging functions.
 ## Installation ##
 
  *  Put core/ into the root of your website.
- *  Duplicate or rename **core/db_con/localhost-example.php** to **HOSTNAME.php**. E.g. localhost.php or example.com.php
- *  Update this file with your connection details.
- *  Navigate to HOSTNAME/core/example.php
- *  If you scroll down and you will either see "everything worked!" or some errors.
+ *  Create a config file for your server by duplicating or renaming **core/db_con/localhost-example.php** to **core/db\_con/HOSTNAME.php**. E.g. localhost.php or example.com.php
+ *  Update this file with your database connection details.
+ *  Point your browser towards http://HOSTNAME/core/example.php
+ *  Scroll down and you will either see "everything worked!" or some errors.
+ *  If you have errors it's not my fault.
 
 
 ## Usage ##
@@ -17,7 +18,7 @@ Manages PDO connection and provides basic debugging functions.
 Setting up core in your script:
 
     // Prevent direct access.
-    define('IN_SCRIPT', 'what the hell');
+    define('IN_SCRIPT', true);
 
     // Include the class definition
     require_once 'core.php';
