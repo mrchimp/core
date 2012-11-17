@@ -29,7 +29,14 @@ Setting up core in your script:
 For further examples see core/example.php
 
 
+## Computer says no ##
 
+This error is designed to not give any information away. If you want more information switch core into debug mode by doing this:
+
+    $core = Core::getInstance();
+    $core->setDebug(true);
+    
+**Just don't leave debug mode on in production!**
 
 
 ## Public Methods ##
