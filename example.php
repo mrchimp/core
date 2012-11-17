@@ -102,12 +102,25 @@
 
 <?php
   $sql = "INSERT 
-                 INTO test_table 
-                   (name)
-                 VALUES
-                   ('Alice')";
+         INTO test_table 
+           (name,
+            comment)
+         VALUES
+           (:name,
+            :comment)";
 
-  $result = $core->executeSQL($sql);
+  $data = array(
+    array(
+      ':name' => 'Alice',
+      ':comment' => 'Hello.'
+    ),
+    array(
+      ':name' => 'Bob',
+      ':comment' => 'Goobye.'
+    )
+  );
+                   
+  $result = $core->executeSQL($sql, $data);
   
   if ($result) {
     echo '<p>Success!</p>';
