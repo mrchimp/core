@@ -7,7 +7,7 @@ Manages PDO connection and provides basic debugging functions.
 
  *  Put core/ into the root of your website.
  *  Create a config file for your server by duplicating or renaming **core/db_con/localhost-example.php** to **core/db\_con/HOSTNAME.php**. E.g. localhost.php or example.com.php
- *  Update this file with your database connection details. Core comes with an empty sqlite database so to get going quickly all you need to do is set ROOT_DIR to the location of your web root directory on your server.
+ *  Update this file with your database connection details. Core comes with an empty sqlite database so to get going quickly all you need to do is set ROOT_DIR to the location of your web root directory on your server. Note: This is the local URL of your website, e.g. **c:/websites/example/** NOT **http://example.com/**
  *  Point your browser towards http://HOSTNAME/core/example.php
  *  Scroll down and you will either see "everything worked!" or some errors.
  *  If you have errors it's not my fault.
