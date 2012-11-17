@@ -107,13 +107,14 @@ class Core {
    * @param string $name the name of the variable being written (optional)
    */
   public function write($var, $name='') {
-    echo '<pre>DUMPING VAR';
+    $o = '<pre>DUMPING VAR';
     if (!empty($name)) echo " '$name': ";
-    echo '{{{<br>';
+    $o .= '{{{<br>';
     $raw_var = print_r($var, true);
     $raw_var = htmlspecialchars($raw_var);
-    echo $raw_var;
-    echo '}}}</pre>';
+    $o .= $raw_var;
+    $o .= '}}}</pre>';
+    return $o;
   }
 
   /**

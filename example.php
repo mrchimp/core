@@ -131,10 +131,10 @@
     echo '<p>Success!</p>';
     
     echo '<h2>Writing data with write()...</h2>';
-    $core->write($data);
+    echo $core->write($data);
 
     echo '<h2>Writing data with writeArrayNicely()...</h2>';
-    $core->writeArrayNicely($data);
+    echo $core->writeArrayNicely($data);
     
   } else {
     echo('No results found.');
