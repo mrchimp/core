@@ -36,15 +36,24 @@
 
 <h2>Installation</h2>
 
-<ul>
-<li> Put core/ into the root of your website.</li>
-<li> Create a config file for your server by duplicating or renaming <strong>core/db_con/localhost-example.php</strong> to <strong>core/db_con/HOSTNAME.php</strong>. E.g. localhost.php or example.com.php</li>
-<li> Update this file with your database connection details. Core comes with an empty sqlite database so to get going quickly all you need to do is set ROOT_DIR to the location of your web root directory on your server. Note: This is the local URL of your website, e.g. <strong>c:/websites/example/</strong> NOT <strong><a href="http://example.com/">http://example.com/</a></strong>
-</li>
-<li> Point your browser towards http://HOSTNAME/core/example.php</li>
-<li> Scroll down and you will either see "everything worked!" or some errors.</li>
-<li> If you have errors it's not my fault.</li>
-</ul><h2>Usage</h2>
+<ol>
+  <li> Put core/ into the root of your website.</li>
+  <li> Create a Core config file for this server.
+    <ul>
+      <li>duplicate <strong>core/db_con/localhost-example.php</strong></li>
+      <li>rename the new file to <strong>core/db_con/__HOSTNAME__.php</strong> where __HOSTNAME__ is the hostname of your server.</li>
+      <li>E.g. localhost.php or example.com.php</li>
+    </ul>
+  <li> Update this file with your database connection details. 
+    <ul>
+      <li>Note: Core comes with an empty sqlite database so to get going quickly all you need to do is set ROOT_DIR to the location of your web root directory on your server. This is the local URL of your website, e.g. <strong>c:/websites/example/</strong> NOT <strong>http://example.com/</strong></li>
+      <li>The dbuser, dbpassword and dsn values will be passed to the PDO constructor. For more information see <a href="http://php.net/manual/en/pdo.connections.php">this PHP manual page</a>.</li>
+    </ul>
+  </li>
+  <li> Point your browser towards http://__HOSTNAME__/core/example.php</li>
+  <li> Scroll down and you will either see "everything worked!" or some errors.</li>
+  <li> If you have errors it's not my fault.</li>
+</ol><h2>Usage</h2>
 
 <p>Setting up core in your script:</p>
 
