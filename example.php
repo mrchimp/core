@@ -1,4 +1,6 @@
-<!DOCTYPE HTML>
+
+
+  <!DOCTYPE HTML>
 <html lang="en">
 <head>
   <title>Core.php Test Page</title>
@@ -8,62 +10,43 @@
       font-family: arial, sans-serif;
       font-size: 14px;
     }
+    .success {
+      color: #090;
+      font-weight: bold;
+    }
+    .error {
+      color: #900;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
 
+<h2>Loading Core.php file...</h2>
 <?php
-  
-  /**
-   * Setting up
-   */ 
-  
+
   // Define IN_SCRIPT
   define('IN_SCRIPT', true);
 
+ini_set('error_reporting', E_ALL);
+
+ini_set('display_errors', 1);
+
+try {
   // include the class definition
   require_once 'core.php';
 
   // Use getInstance rather than "new Core()"
-  $core = Core::getInstance();
+  $core = new Core();
 
-  
   $core->startTimer();
+} catch (Exception $e) {
+  var_dump($e);
+  exit();
+}
 ?> 
   
-
-  
-  
-<h2>Using write($test)</h2>
-
-<?php
-  $test = array(
-    1, 
-    2, 
-    'foo', 
-    'bar', 
-    array(5, 6, 7), 
-    $core,
-    'this' => 'that',
-    'true' => false
-  );
-
-  echo $core->write($test, 'test');
-?>
-
-
-
-
-<h2>Using writeArrayNicely($GLOBALS)</h2>
-
-<?php
-  echo $core->writeArrayNicely($GLOBALS);
-  
-  // Note: The globals variable contains a reference to itself.
-  //       writeArrayNicely() contains a workaround to prevent
-  //       infinite recursion. However this only works for the
-  //       $GLOBALS array - other recursive arrays may break it.
-?>
+<p class="success">Success!</p>
 
   
   
@@ -71,28 +54,32 @@
 <h2>Creating test table using executeSQL()...</h2>
 
 <?php
+
   if ($core->dbh->getAttribute(PDO::ATTR_DRIVER_NAME) == 'sqlite') {
     $sql = 'CREATE TABLE IF NOT EXISTS test_table 
                     (
                       id INTEGER PRIMARY KEY AUTOINCREMENT, 
-                      name TEXT
+                      name TEXT,
+                      comment TEXT
                     )';
   } else {
     $sql = 'CREATE TABLE IF NOT EXISTS test_table 
                     (
                       id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
-                      name TEXT
+                      name VARCHAR(128),
+                      comment VARCHAR(128)
                     )';
   }
   
   $result = $core->executeSQL($sql);
   
   if ($result) {
-    echo '<p>Success!</p>';
+    echo '<p class="success">Success!</p>';
   } else {
-    echo '<p>Problem creating test table. Exiting...</p>';
+    echo '<p class="error">Problem creating test table. Exiting...</p>';
     exit();
   }
+
 ?>
 
 
@@ -101,6 +88,7 @@
 <h2>Inserting some user data using executeURL()...</h2>
 
 <?php
+
   $sql = "INSERT 
          INTO test_table 
            (name,
@@ -123,11 +111,12 @@
   $result = $core->executeSQL($sql, $data);
   
   if ($result) {
-    echo '<p>Success!</p>';
+    echo '<p class="success">Success!</p>';
   } else {
-    echo '<p>Error inserting names. Exiting...</p>';
+    echo '<p class="error">Error inserting names. Exiting...</p>';
     exit();
   }
+
 ?>
   
 
@@ -141,18 +130,19 @@
   $data = $core->executeSQL($sql);
 
   if (is_array($data)) {
-    echo '<p>Success!</p>';
+    echo '<p class="success">Success!</p>';
     
     echo '<h2>Writing data with write()...</h2>';
-    echo $core->write($data);
+    echo $core->write($data, 'Database data');
 
     echo '<h2>Writing data with writeArrayNicely()...</h2>';
     echo $core->writeArrayNicely($data);
     
   } else {
-    echo('No results found.');
+    echo('<p class="error">No results found.</p>');
     exit();
   }
+
 ?>
   
 
@@ -164,9 +154,9 @@
   $sql = 'DELETE FROM test_table';
 
   if($core->executeSQL($sql)){
-    echo '<p>Success!</p>';
+    echo '<p class="success">Success!</p>';
   } else {
-    echo '<p>Failed. Exiting.</p>';
+    echo '<p class="error">Failed. Exiting.</p>';
     exit();
   }
 ?>
@@ -180,9 +170,9 @@
   $sql = 'DROP TABLE test_table';
   
   if ($core->executeSQL($sql)) {
-    echo '<p>Success!</p>';
+    echo '<p class="success">Success!</p>';
   } else {
-    echo '<p>Failed. Exiting.</p>';
+    echo '<p class="error">Failed. Exiting.</p>';
     exit();
   }
 
