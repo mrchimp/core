@@ -1,5 +1,6 @@
 <?php 
-  defined('IN_SCRIPT') or die('No direct access.');
+
+defined('IN_SCRIPT') or die('No direct access.');
 
 /**
  * Database connection and helper function class
@@ -8,14 +9,12 @@
  *
  * LICENSE: Unlicensed
  *
- * @author	Jake Gully <jake@deviouschimp.co.uk>
+ * @author    Jake Gully <jake@deviouschimp.co.uk>
  * @author    Daniel Hewes <daniel@danimalweb.co.uk>
- * @copyright	2011 Jake Gully and Daniel Hewes
- * @link        http://github.com/mrchimp/core
- * @license	Unlicensed
+ * @copyright 2011 Jake Gully and Daniel Hewes
+ * @link      http://github.com/mrchimp/core
+ * @license   Unlicensed
  */
-
-
 
  
 class Core {
@@ -23,31 +22,50 @@ class Core {
   public $dbh;
 
   private static $_instance;
-  private static $_dsn;
-  private static $_user;
-  private static $_pass;
+  // private static $_dsn;
+  // private static $_user;
+  // private static $_pass;
+  private $settings;
 
   /**
-   * Constructor. This is a singleton so do not use. Call getInstance instead.
+   * Constructor!
+   *
+   * @param Array $settings
    */
-  private function __construct ($host = null) {
+  function __construct (array $user_settings = array()) {
+
     set_error_handler(array($this, 'coreErrorHandler'));
-  
-    if ($host == null) $host = $_SERVER['SERVER_NAME'];
-    define('HOST', $host);
-		
-    if (!include_once('db_con/'.HOST.'.php')) {
-      die('No database config file.');
-    }
     
-    self::$_dsn  = DSN;
-    self::$_user = DBUSER;
-    self::$_pass = DBPASSWORD;
+    $this->settings = array(
+      'username'   => '',
+      'password'   => '',
+      'email'      => '',
+      'dsn'        => 'sqlite:' . __DIR__ . '/db/database.db',
+      'config_dir' => __DIR__ . '/config',
+      'log_file'   => __DIR__ . '/custom.log',
+    );
+
+    if ($user_settings === null) {
+      if (!$user_settings = include('config/'.$_SERVER['SERVER_NAME'].'.php')) {
+        if ($this->isDebugOn()) {
+          trigger_error('Core is using default settings.', E_USER_NOTICE);
+        }
+      } else {
+        $user_settings = array();
+      }
+    }
+   
+    $this->settings = array_merge($this->settings, $user_settings);
 		
     try {
-      $this->dbh = new PDO(self::$_dsn,self::$_user,self::$_pass);
+      $this->dbh = new PDO(
+        $this->settings['dsn'],
+        $this->settings['username'],
+        $this->settings['password']
+      );
       $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     } catch (PDOException $e) {
+      var_dump($this->settings);
       trigger_error('Unable to establish a database connection: '.$e->getMessage(), E_USER_ERROR);
       exit(0);
     }
@@ -56,7 +74,7 @@ class Core {
   /**
    * Returns an instance of the class.
    *
-   * Use this instead of __construct. e.g:
+   * You can use this instead of __construct. e.g:
    * $core = Core::getInstance()
    *
    * @return object
@@ -64,7 +82,7 @@ class Core {
   public static function getInstance() {
     if(!isset(self::$_instance)){
       $object= __CLASS__;
-      self::$_instance=new $object;
+      self::$_instance = new $object;
     }
     return self::$_instance;
   }
@@ -78,24 +96,34 @@ class Core {
    * @param string $sql	the SQL to be processed
    * @param array  $params the parameters to bind (optional)
    */
-  public function executeSQL($sql, $params = array()) {
+  public function executeSQL($sql, $data = array()) {
     try {
       $stmt = $this->dbh->prepare($sql); //Used by all query types.
-      
+
       if (substr($sql, 0, 6) === "SELECT") { 
-        //Select
-        $stmt->execute($params);
+        // Select
+        $stmt->execute($data);
         return $stmt->fetchAll(PDO::FETCH_ASSOC); //Returns an Array if data returned. Use is_array to check.
       } else { 
-        //Create/Insert/Update/Delete/Drop
-        return $stmt->execute($params); //Returns true/false
+        // Create/Insert/Update/Delete/Drop  
+        // if ($core->dbh->getAttribute(PDO::ATTR_DRIVER_NAME) == 'sqlite') {
+        if ($this->dbh->getAttribute(PDO::ATTR_DRIVER_NAME) == 'sqlite'
+        && isset($data[0]) 
+        && gettype($data[0]) == 'array') {
+          foreach ($data as $datum) {
+            $stmt->execute($datum);
+          }
+          return true;
+        } else {
+          return $stmt->execute($data); //Returns true/false
+        }
       }
       
     } catch(PDOException $e) {
-      trigger_error('Core::executeSQL() encountered a problem. 
-                     DBO says: ' . $e->getMessage() .
-                     (isset($stmt) ? ' Debug Params: ' . $stmt->debugDumpParams() : ''), 
-                     E_USER_ERROR);
+      trigger_error(
+        'Core::executeSQL() encountered a problem: ' . $e->getMessage() .
+        (isset($stmt) ? ' Debug Params: ' . $stmt->debugDumpParams() : ''), 
+        E_USER_ERROR);
       exit(0);
     }
   }
@@ -106,14 +134,17 @@ class Core {
    * @param string $var	 the value to be written
    * @param string $name the name of the variable being written (optional)
    */
-  public function write($var, $name='') {
-    $o = '<pre>DUMPING VAR';
-    if (!empty($name)) echo " '$name': ";
-    $o .= '{{{<br>';
-    $raw_var = print_r($var, true);
+  public function write($var, $name = '') {
+    $o = '<pre>START DUMP';
+    if (!empty($name)) {
+      $o .= " $name";
+    }
+    $o .= ':<br>';
+    $raw_var = var_export($var, true);
     $raw_var = htmlspecialchars($raw_var);
     $o .= $raw_var;
-    $o .= '}}}</pre>';
+    $o .= '<br>';
+    $o .= 'END DUMP</pre>';
     return $o;
   }
 
@@ -203,7 +234,9 @@ class Core {
    */
   private function depthHex($depth) {
     $val = (16 - ($depth * 1));
-    if ($val < 0) $val = 0;
+    if ($val < 0) {
+      $val = 0;
+    }
     $val = dechex($val);
     $color = "#$val$val$val";
     return $color;
@@ -324,6 +357,7 @@ class Core {
    * @param int $err_line the line number of the error
    */
   public function coreErrorHandler($err_code, $err_str, $err_file, $err_line) {
+
     $error_type = array (
                   E_WARNING       => 'Warning',
                   E_NOTICE        => 'Notice',
