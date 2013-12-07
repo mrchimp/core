@@ -11,7 +11,7 @@ Manages PDO connection and provides basic debugging functions.
 ## Installation ##
 
  * Put core/ somewhere sensible.
- * [Optional] Create a config file for your server by duplicating or renaming **core/db_con/localhost-example.php** to **core/core/HOSTNAME.php**. E.g. localhost.php or example.com.php
+ * [Optional] Create a config file for your server by duplicating or renaming **core/config/example.com.php** to **core/config/YOURHOSTNAME.php**. E.g. localhost.php
  * Update this file with your database connection details. Core comes with an empty sqlite database so to get going quickly with zero config.
  * If you didn't create a file above you can alternatively pass an array of settings when creating the object. You can also override the file by doing this.
  *  Point your browser towards http://HOSTNAME/core/example.php
@@ -41,15 +41,40 @@ This error is designed to not give any information away. If you want more inform
 
     $core = Core::getInstance();
     $core->setDebug(true);
-    
+
 **Just don't leave debug mode on in production!**
 
+## Settings ##
+
+You can override settings by passing an array when creating a new Core object.
+
+    $core = new Core(array(
+        'key': 'value'
+    ));
+
+# Available options: # 
+
+Name (Type, Default)
+
+ * debug (Boolean, false)
+   Set to false to enable display_errors
+ * username (String, '')
+   Database username.
+ * password (String, '')
+   Database password.
+ * email (String, '')
+   Email to mail serious errors to.
+ * dsn (String', 'sqlite:' . __DIR__ . '/db/database.db')
+   Database connection string.
+ * config_dir (String, __DIR__ . '/config')
+   Directory where connection config files are stored.
+ * log_file (String, __DIR__ . '/custom.log')
+   File to log errors to.
 
 ## Public Methods ##
 
 
 ### getInstance() ###
-
 
 Returns an instance of Core.
 
