@@ -1,6 +1,4 @@
-
-
-  <!DOCTYPE HTML>
+<!DOCTYPE HTML>
 <html lang="en">
 <head>
   <title>Core.php Test Page</title>
@@ -36,7 +34,10 @@ try {
   // include the class definition
   require_once 'core.php';
 
-  // Use getInstance rather than "new Core()"
+  $settings = array(
+    'debug' => true
+  );
+
   $core = new Core();
 
   $core->startTimer();
@@ -48,8 +49,43 @@ try {
   
 <p class="success">Success!</p>
 
-  
-  
+
+
+<h2>SQL Query Generation with makeSQL()</h2>
+
+<?php 
+
+$test_data1 = array(
+  'id' => 1,
+  'name' => 'Fred Test',
+  'age'  => 42,
+  'title' => 'Chief Tester'
+);
+
+$test_data2 = array(
+  array(
+    'id' => 1,
+    'name' => 'Fred Test',
+    'age'  => 42,
+    'title' => 'Chief Tester'
+  ),
+  array(
+    'id' => 2,
+    'name' => 'Dave Random',
+    'age'  => 29,
+    'title' => 'Backup Tester'
+  )
+);
+
+
+echo $core->makeSQL('update', $test_data1, 'sometable');
+echo '<br><br>';
+
+echo $core->makeSQL('update', $test_data2, 'sometable', 9);
+echo '<br><br>';
+
+
+?>
   
 <h2>Creating test table using executeSQL()...</h2>
 

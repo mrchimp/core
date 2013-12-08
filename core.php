@@ -22,9 +22,6 @@ class Core {
   public $dbh;
 
   private static $_instance;
-  // private static $_dsn;
-  // private static $_user;
-  // private static $_pass;
   private $settings;
 
   /**
@@ -37,18 +34,21 @@ class Core {
     set_error_handler(array($this, 'coreErrorHandler'));
     
     $this->settings = array(
+      'debug'      => false,
       'username'   => '',
       'password'   => '',
       'email'      => '',
       'dsn'        => 'sqlite:' . __DIR__ . '/db/database.db',
-      'config_dir' => __DIR__ . '/config',
+      'config_dir' => __DIR__ . '/config/',
       'log_file'   => __DIR__ . '/custom.log',
     );
 
-    if ($user_settings === null) {
-      if (!$user_settings = include('config/'.$_SERVER['SERVER_NAME'].'.php')) {
-        if ($this->isDebugOn()) {
-          trigger_error('Core is using default settings.', E_USER_NOTICE);
+    $config_file = $this->settings['config_dir'].$_SERVER['SERVER_NAME'].'.php';
+
+    if (!is_array($user_settings)) {
+      if (file_exists($config_file)) {
+        if (!$user_settings = @include($config_file)) {
+          $user_settings = array();
         }
       } else {
         $user_settings = array();
@@ -57,6 +57,10 @@ class Core {
    
     $this->settings = array_merge($this->settings, $user_settings);
 		
+    if ($this->settings['debug']) {
+      $this->setDebug(true);
+    }
+
     try {
       $this->dbh = new PDO(
         $this->settings['dsn'],
@@ -106,7 +110,6 @@ class Core {
         return $stmt->fetchAll(PDO::FETCH_ASSOC); //Returns an Array if data returned. Use is_array to check.
       } else { 
         // Create/Insert/Update/Delete/Drop  
-        // if ($core->dbh->getAttribute(PDO::ATTR_DRIVER_NAME) == 'sqlite') {
         if ($this->dbh->getAttribute(PDO::ATTR_DRIVER_NAME) == 'sqlite'
         && isset($data[0]) 
         && gettype($data[0]) == 'array') {
@@ -441,5 +444,69 @@ class Core {
     $query = preg_replace($keys, $params, $query, 1, $count);
   	
     return $query;
+  }
+
+  /**
+   * Make sql statements using assoc array
+   *
+   * @author    Daniel Hewes
+   * @date      December 2013
+   * 
+   * @param  string  $type  Either 'update' or 'insert'
+   * @param  array   $data  The data to use
+   * @param  string  $table Database table to use
+   * @param  integer $id    
+   * @return string  The generated SQL query
+   */
+  public function makeSQL($type, $data, $table, $id = NULL) {
+
+    if ( is_array($data) ) { //We have an array so its all good.
+
+      switch ($type) {
+        case 'update':
+          return 'this fails';
+          $sql = 'UPDATE ' . $table . ' SET ';
+          $updates = array();
+          
+          foreach ($data as $field => $value) {
+            
+            if( !empty($value) ) { //Only if we have a value.
+            
+              $value = "'$value'";
+              $updates[] = "$field = $value";
+            
+            }
+
+          }
+          
+          $sql .= implode(', ', $updates);
+
+          if (!is_null($id)) {
+            $sql .= ' WHERE id=' . $data['id'];
+          }
+          
+          break;
+            
+        case 'insert':
+          // Split the fields and values into separate arrays.
+          $fields    = array_keys($data);
+          $values    = array_values($data);
+          $fieldlist = implode(',', $fields);
+          $qs        = implode(',', array_fill(0, count($fields), '?'));
+          $sql       = "INSERT INTO $table($fieldlist) values($qs)";
+          break;
+        default:
+          trigger_error('Core.php: Invalid type in makeSQL: ' . $type, E_USER_WARNING);
+          return false;
+      }
+  
+      return $sql;
+    
+    } else { //Send an error is not a valid array.
+    
+        return 'Error. Not a valid array.';
+    
+    }
+  
   }
 }
