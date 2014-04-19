@@ -463,29 +463,30 @@ class Core {
     if ( is_array($data) ) { //We have an array so its all good.
 
       switch ($type) {
-        case 'update':
-          return 'this fails';
-          $sql = 'UPDATE ' . $table . ' SET ';
-          $updates = array();
-          
-          foreach ($data as $field => $value) {
-            
-            if( !empty($value) ) { //Only if we have a value.
-            
-              $value = "'$value'";
-              $updates[] = "$field = $value";
-            
-            }
+        // case 'update':
+        //   return 'this fails';
 
-          }
+        //   $sql = 'UPDATE ' . $table . ' SET ';
+        //   $updates = array();
           
-          $sql .= implode(', ', $updates);
+        //   foreach ($data as $field => $value) {
+            
+        //     if( !empty($value) ) { //Only if we have a value.
+            
+        //       $value = "'$value'";
+        //       $updates[] = "$field = $value";
+            
+        //     }
 
-          if (!is_null($id)) {
-            $sql .= ' WHERE id=' . $data['id'];
-          }
+        //   }
           
-          break;
+        //   $sql .= implode(', ', $updates);
+
+        //   if (!is_null($id)) {
+        //     $sql .= ' WHERE id=' . $data['id'];
+        //   }
+          
+        //   break;
             
         case 'insert':
           // Split the fields and values into separate arrays.
@@ -493,7 +494,7 @@ class Core {
           $values    = array_values($data);
           $fieldlist = implode(',', $fields);
           $qs        = implode(',', array_fill(0, count($fields), '?'));
-          $sql       = "INSERT INTO $table($fieldlist) values($qs)";
+          $sql       = "INSERT INTO $table ($fieldlist) VALUES ($qs)";
           break;
         default:
           trigger_error('Core.php: Invalid type in makeSQL: ' . $type, E_USER_WARNING);

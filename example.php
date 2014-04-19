@@ -26,25 +26,25 @@
   // Define IN_SCRIPT
   define('IN_SCRIPT', true);
 
-ini_set('error_reporting', E_ALL);
+  ini_set('error_reporting', E_ALL);
 
-ini_set('display_errors', 1);
+  ini_set('display_errors', 1);
 
-try {
-  // include the class definition
-  require_once 'core.php';
+  try {
+    // include the class definition
+    require_once 'core.php';
 
-  $settings = array(
-    'debug' => true
-  );
+    $settings = array(
+      'debug' => true
+    );
 
-  $core = new Core();
+    $core = new Core();
 
-  $core->startTimer();
-} catch (Exception $e) {
-  var_dump($e);
-  exit();
-}
+    $core->startTimer();
+  } catch (Exception $e) {
+    var_dump($e);
+    exit();
+  }
 ?> 
   
 <p class="success">Success!</p>
@@ -81,7 +81,10 @@ $test_data2 = array(
 echo $core->makeSQL('update', $test_data1, 'sometable');
 echo '<br><br>';
 
-echo $core->makeSQL('update', $test_data2, 'sometable', 9);
+echo $core->makeSQL('update', $test_data2, 'sometable');
+echo '<br><br>';
+
+echo $core->makeSQL('insert', $test_data2, 'sometable', 9);
 echo '<br><br>';
 
 
