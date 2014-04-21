@@ -1,4 +1,4 @@
-<?php 
+<?php namespace Mrchimp; 
 
 defined('IN_SCRIPT') or die('No direct access.');
 
