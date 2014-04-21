@@ -1,5 +1,7 @@
 <?php namespace Mrchimp; 
 
+use PDO;
+
 defined('IN_SCRIPT') or die('No direct access.');
 
 /**
