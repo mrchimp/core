@@ -7,7 +7,7 @@
  */
 
 if (!defined('IN_SCRIPT')) {
-  header("HTTP/1.0 404 Not Found");
+  header("HTTP/1.0 500 Internal server error");
   trigger_error('Core.php: IN_SCRIPT constant is not defined.')
 }
 

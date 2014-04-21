@@ -122,9 +122,9 @@ class Core {
         }
       }
       
-    } catch(PDOException $e) {
+    } catch(PDOException $error) {
       trigger_error(
-        'Core::executeSQL() encountered a problem: ' . $e->getMessage() .
+        'Core::executeSQL() encountered a problem: ' . $error->getMessage() .
         (isset($stmt) ? ' Debug Params: ' . $stmt->debugDumpParams() : ''), 
         E_USER_ERROR);
       exit(0);
@@ -137,7 +137,7 @@ class Core {
    * @param string $var	 the value to be written
    * @param string $name the name of the variable being written (optional)
    */
-  public function write($var, $name = '') {
+  static public function write($var, $name = '') {
     $o = '<pre>START DUMP';
     if (!empty($name)) {
       $o .= " $name";
@@ -163,7 +163,7 @@ class Core {
    *                       function calls itself
    * @return string        the generated string
    */
-  public function writeArrayNicely($array, $recurse=true, $depth=1) {
+  static public function writeArrayNicely($array, $recurse=true, $depth=1) {
     $o = '';
 
     if ($depth == 1) {
@@ -179,7 +179,7 @@ class Core {
     if (!is_array($array)) return '<p>That wasn\'t an array.</p>';
     
     if ($depth == 1) {
-      $o .= '<div class="nicearray" style="background-color:'.$this->depthHex($depth).';">';
+      $o .= '<div class="nicearray" style="background-color:'.self::depthHex($depth).';">';
     }
 
     // write number of elements in array
@@ -187,7 +187,7 @@ class Core {
 
     // For each item in array
     foreach($array as $key=>$value) {
-      $o .= '<div class="nicearray" style="background-color:'.$this->depthHex($depth+2).';">';
+      $o .= '<div class="nicearray" style="background-color:'.self::depthHex($depth+2).';">';
       
       // Write value's variable type
       if (gettype($key) == 'string') {
@@ -202,7 +202,7 @@ class Core {
           $o .=  '$_GLOBALS [not showing to avoid infinite recursion]';
         } else {
           if ($recurse==true) {
-            $o .= $this->writeArrayNicely($value, true, ($depth+1));
+            $o .= self::writeArrayNicely($value, true, ($depth+1));
           }
         }
       } else if (is_object($value)) {
@@ -235,7 +235,7 @@ class Core {
    *                   The higher the number the darker the resulting colour.
    * @return string the generated hex color, including leading #
    */
-  private function depthHex($depth) {
+  static public function depthHex($depth) {
     $val = (16 - ($depth * 1));
     if ($val < 0) {
       $val = 0;
@@ -360,15 +360,14 @@ class Core {
    * @param int $err_line the line number of the error
    */
   public function coreErrorHandler($err_code, $err_str, $err_file, $err_line) {
-
-    $error_type = array (
+    $error_types = array (
                   E_WARNING       => 'Warning',
                   E_NOTICE        => 'Notice',
                   E_USER_ERROR    => 'User Error',
                   E_USER_WARNING  => 'User Warning',
                   E_USER_NOTICE   => 'User Notice');
-  
-    $err = sprintf('PHP %s:  %s in %s on line %d ', $error_type[$err_code], $err_str, $err_file, $err_line);
+
+    $err = sprintf('PHP %s:  %s in %s on line %d ', $error_types[$err_code], $err_str, $err_file, $err_line);
     $err .= '[client '.$_SERVER['REMOTE_ADDR'].']';
     $err .= "\n";
     

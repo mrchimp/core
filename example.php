@@ -21,24 +21,21 @@
 <body>
 
 <h2>Loading Core.php file...</h2>
-<?php
 
+<?php
   // Define IN_SCRIPT
   define('IN_SCRIPT', true);
 
+  // Turn on error reporting
   ini_set('error_reporting', E_ALL);
-
   ini_set('display_errors', 1);
 
   try {
-    // include the class definition
     require_once 'core.php';
 
-    $settings = array(
+    $core = new Core(array(
       'debug' => true
-    );
-
-    $core = new Core();
+    ));
 
     $core->startTimer();
   } catch (Exception $e) {
@@ -50,45 +47,6 @@
 <p class="success">Success!</p>
 
 
-
-<h2>SQL Query Generation with makeSQL()</h2>
-
-<?php 
-
-$test_data1 = array(
-  'id' => 1,
-  'name' => 'Fred Test',
-  'age'  => 42,
-  'title' => 'Chief Tester'
-);
-
-$test_data2 = array(
-  array(
-    'id' => 1,
-    'name' => 'Fred Test',
-    'age'  => 42,
-    'title' => 'Chief Tester'
-  ),
-  array(
-    'id' => 2,
-    'name' => 'Dave Random',
-    'age'  => 29,
-    'title' => 'Backup Tester'
-  )
-);
-
-
-echo $core->makeSQL('update', $test_data1, 'sometable');
-echo '<br><br>';
-
-echo $core->makeSQL('update', $test_data2, 'sometable');
-echo '<br><br>';
-
-echo $core->makeSQL('insert', $test_data2, 'sometable', 9);
-echo '<br><br>';
-
-
-?>
   
 <h2>Creating test table using executeSQL()...</h2>
 
@@ -143,7 +101,7 @@ echo '<br><br>';
     ),
     array(
       ':name' => 'Bob',
-      ':comment' => 'Goobye.'
+      ':comment' => 'Goodbye.'
     )
   );
                    
@@ -215,13 +173,57 @@ echo '<br><br>';
     exit();
   }
 
+?>
+
+
+
+
+<h2>SQL Query Generation with makeSQL()</h2>
+
+<p>This section is still being developed. There will be warnings below.</p>
+
+<?php 
+
+  $test_data1 = array(
+    'id' => 1,
+    'name' => 'Fred Test',
+    'age'  => 42,
+    'title' => 'Chief Tester'
+  );
+
+  $test_data2 = array(
+    array(
+      'id' => 1,
+      'name' => 'Fred Test',
+      'age'  => 42,
+      'title' => 'Chief Tester'
+    ),
+    array(
+      'id' => 2,
+      'name' => 'Dave Random',
+      'age'  => 29,
+      'title' => 'Backup Tester'
+    )
+  );
+
+
+  echo $core->makeSQL('update', $test_data1, 'sometable');
+  echo '<br><br>';
+
+  echo $core->makeSQL('update', $test_data2, 'sometable');
+  echo '<br><br>';
+
+  echo $core->makeSQL('insert', $test_data2, 'sometable', 9);
+  echo '<br><br>';
+
   
-  
-  
-  /**
-   * Wrap it up.
-   */
-  echo '<br>That all took '.$core->getTime().' seconds. <br><br>';
+?>
+
+<h1>All done</h1>
+
+<?php 
+
+  echo 'That all took '.$core->getTime().' seconds. <br><br>';
   echo 'If you\'re reading this then everything worked!';
 
 ?>

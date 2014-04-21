@@ -1,0 +1,5 @@
+{
+  "name": "mrchimp/core",
+  "description": "Base class for small projects. Handles PDO connections.",
+  "version": "2.0.1"
+}
