@@ -25,40 +25,64 @@ class Core {
 
   private static $_instance;
   private $settings;
+  private $config_dir;
+  private $config_file;
 
   /**
    * Constructor!
    *
    * @param Array $settings
    */
-  function __construct (array $user_settings = array()) {
+  function __construct ($user_settings = null) {
 
     set_error_handler(array($this, 'coreErrorHandler'));
     
+    $this->config_dir = __DIR__ . '/config/';
+    
+
     $this->settings = array(
       'debug'      => false,
       'username'   => '',
       'password'   => '',
       'email'      => '',
       'dsn'        => 'sqlite:' . __DIR__ . '/db/database.db',
-      'config_dir' => __DIR__ . '/config/',
       'log_file'   => __DIR__ . '/custom.log',
     );
 
-    $config_file = $this->settings['config_dir'].$_SERVER['SERVER_NAME'].'.php';
+    // Extend settings with appropriate array...
+    switch (gettype($user_settings)) {
+      // Use passed array
+      case 'array':
+        $this->settings = array_merge($this->settings, $user_settings);
+        break;
 
-    if (!is_array($user_settings)) {
-      if (file_exists($config_file)) {
-        if (!$user_settings = @include($config_file)) {
+      // Use string as config dir and continue
+      case 'string':
+        $this->config_dir = $user_settings;
+        // break; // No break here!
+      
+      // Use config from config dir
+      case 'NULL':
+        $this->config_file = $this->config_dir.$_SERVER['SERVER_NAME'].'.php';
+
+        $user_settings = array();
+        if (file_exists($this->config_file)) {
+          if (!$user_settings = include($this->config_file)) {
+            trigger_error('Failed to load config file!', E_USER_WARNING);
+            $user_settings = array();
+          }
+        } else {
+          trigger_error('Config file does not exist: ' . $this->config_file, E_USER_WARNING);
           $user_settings = array();
         }
-      } else {
-        $user_settings = array();
-      }
+
+        $this->settings = array_merge($this->settings, $user_settings);
+        break;
+      
+      default:
+        trigger_error('Invalid $user_settings in Core. ' . gettype($user_settings) . ' passed. Should be string or array.', E_USER_ERROR);
     }
-   
-    $this->settings = array_merge($this->settings, $user_settings);
-		
+
     if ($this->settings['debug']) {
       $this->setDebug(true);
     }
@@ -70,9 +94,8 @@ class Core {
         $this->settings['password']
       );
       $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    } catch (PDOException $e) {
-      var_dump($this->settings);
-      trigger_error('Unable to establish a database connection: '.$e->getMessage(), E_USER_ERROR);
+    } catch (\PDOException $e) {
+      trigger_error('Unable to establish a database connection: '.$e->getMessage() . " \n==== \nUsing config_file: " . $this->config_file . " \n==== \nSettings: " . print_r($this->settings, true), E_USER_ERROR);
       exit(0);
     }
   }
